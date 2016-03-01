@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no,
+		shrink-to-fit=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+	<!-- Solves cache problems, see https://evothings.com/doc/build/share-apps.html -->
+	<meta http-equiv="pragma" content="no-cache" />
+	<meta http-equiv="expires" content="-1" />
+
+	<title>DA1458x Beacon Demo</title>
+
+	<style>
+		@import 'ui/css/evothings-app.css';
+		@import 'ui/css/app.css';
+	</style>
+
+	
+	<script>
+		// Redirect console if running from Evothings Workbench.
+		if (window.hyper) { console.log = hyper.log }
+	</script>
+
+</head>
+
+<body ontouchstart=""><!-- ontouchstart="" enables low-delay CSS transitions. -->
+
+		<header>
+			<button class="back" onclick="history.back()">
+				<img src="ui/images/arrow-left.svg" />
+			</button>
+		
+			<img class="logotype" src="ui/images/logo.png" alt="Evothings" />
+
+			<button id="menu-button" tabindex="0" onclick="this.focus()">
+				<img src="ui/images/menu.svg" />
+			</button>
+
+			<menu>
+				<menuitem>
+					<a href="#">Home</a>
+				</menuitem>
+
+				<menuitem>
+					<a href="#troubleshooting">Troubleshooting</a>
+				</menuitem>
+			</menu>
+		</header>
+
+		<div class="container">
+			<div class="eddystone" id="page-eddystone-default">
+				<h1>Eddystone demo</h1>
+				<p>Please move within range of the Beacons</p>
+			</div>
+
+			<div class="eddystone" id="page-eddystone-elephant">
+				<h1>Eddystone</h1>
+				<img class="my-header-image" src="photos/picture-elephant.png" />
+			</div>
+
+			<div class="eddystone" id="page-eddystone-giraffe">
+				<h1>Eddystone</h1>
+				<img class="my-header-image" src="photos/picture-giraffe.png" />
+			</div>
+
+
+			<div class="ibeacon" id="page-ibeacon-default">
+				<h1>iBeacon demo</h1>
+				<p>Please move within range of the Beacons</p>
+			</div>
+
+			<div class="ibeacon" id="page-ibeacon-elephant">
+				<h1>iBeacon</h1>
+				<img class="my-header-image" src="photos/picture-elephant.png" />
+			</div>
+
+			<div class="ibeacon" id="page-ibeacon-giraffe">
+				<h1>iBeacon</h1>
+				<img class="my-header-image" src="photos/picture-giraffe.png" />
+			</div>
+		</div>
+
+
+	<section id='troubleshooting'>
+
+		<h1>Troubleshooting</h1>
+
+		<p>
+			<b>Configured BD addresses:</b></br>
+			80:EA:CA:00:00:03</br>
+			81:DD:CA:00:00:03</br>
+		</p>
+
+		<p>
+			<b>iBeacon UUID's:</b></br>
+			585CDE93-1B01-42CC-9A13-25009BEDC65E</br>
+			595CDE93-1B01-42CC-9A13-25009BEDC65E</br>
+			Major and minors numbers are 1 for both beacons
+		</p>
+
+	</section>
+
+	<script src="lib/jquery.js"></script>
+	<script src="cordova.js"></script>
+	<script src="libs/jquery/jquery.js"></script>
+	<script src="libs/evothings/evothings.js"></script>
+	<script src="libs/evothings/ui/ui.js"></script>
+	<script src="libs/evothings/eddystone/eddystone.js"></script>
+	<script src="app-eddystone.js"></script>
+	<script src="app-ibeacon.js"></script>
+</body>
+</html>

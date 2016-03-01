@@ -1,0 +1,27 @@
+.my-header-image
+{
+	width: 100%;
+	height: auto;
+}
+
+.container
+{
+	margin:0;
+	text-align: center;
+}
+
+.eddystone 
+{
+	float:left;
+	width:50%;
+	overflow:hidden;
+	display:none;
+}
+
+.ibeacon 
+{
+	float:left;
+	width:50%;
+	overflow:hidden;
+	display:none;
+};
