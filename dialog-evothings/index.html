@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no,
+		shrink-to-fit=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+
+	<title>dialog-evothings</title>
+
+	<style>
+		@import 'ui/css/evothings-app.css';
+	</style>
+
+	
+	<script>
+		// Redirect console if running from Evothings Workbench.
+		if (window.hyper) { console.log = hyper.log }
+	</script>
+
+</head>
+
+<body ontouchstart=""><!-- ontouchstart="" enables low-delay CSS transitions. -->
+
+	<header>
+		<img class="logotype" src="ui/images/logo.png" alt="Dialog Semiconductor" />
+	</header>
+
+	<a href="evo://http://nbezembinder1.github.io/blinky/index.html">
+	<button class = "red wide">DA1458x DK Blinky</button>
+	
+	<a href="evo://http://nbezembinder1.github.io/beacons/index.html">
+	<button class = "red wide">Beacon demo</button>
+
+	<a href="evos://https://nbezembinder1.github.io/blinky/index.html">blinky</a>
+	
+	<a href="evos://https://nbezembinder1.github.io/beacons/index.html">beacons</a>
+
+	<script src="cordova.js"></script>
+	<script src="libs/evothings/evothings.js"></script>
+	<script src="libs/evothings/ui/ui.js"></script>
+</body>
+</html>
