@@ -28,15 +28,15 @@ var currentPage = 'page-ibeacon-default';
 // Check for beacons with an rssi higher than this value
 var rssiLimit = -60; 
 
+// false when scanning is off. true when on.
+var isScanning = false;
+
 ibeacon.initialize = function()
 {
 	document.addEventListener(
 		'deviceready',
 		function() { evothings.scriptsLoaded(onDeviceReady) },
 		false);
-	
-	// Display default page
-	gotoPage(currentPage);
 }
 
 // Called when Cordova are plugins initialised,
@@ -46,10 +46,46 @@ function onDeviceReady()
 	// Specify a shortcut for the location manager that
 	// has the iBeacon functions.
 	window.locationManager = cordova.plugins.locationManager;
+}
 
+// Called when button is pressed
+ibeacon.startStop = function()
+{
+	if(isScanning)
+	{
+		document.getElementById('ibeacon-start-stop').innerHTML = 'START IBEACON';
+		stop();
+	}
+	else
+	{
+		document.getElementById('ibeacon-start-stop').innerHTML = 'STOP IBEACON';
+		start();
+	}
+};
+
+
+function start()
+{
+	isScanning = true;
+
+	// Display default page
+	gotoPage(currentPage);
+	
 	// Start tracking beacons!
 	startScanForBeacons();
-}
+};
+
+function stop()
+{
+	isScanning = false;
+	
+	// Hide the current page
+	hidePage(currentPage);
+
+	// Stop scanning beacons
+	stopScanForBeacons();
+};
+
 
 function startScanForBeacons()
 {
@@ -126,6 +162,28 @@ function didRangeBeaconsInRegion(pluginResult)
 	{
 		gotoPage('page-ibeacon-default');
 		return;
+	}
+}
+
+function stopScanForBeacons()
+{
+	// Stop monitoring and ranging our beacons.
+	for (var r in beaconRegions)
+	{
+		var region = beaconRegions[r];
+
+		var beaconRegion = new locationManager.BeaconRegion(
+			region.id, region.uuid, region.major, region.minor);
+
+		// Start monitoring.
+		locationManager.stopMonitoringForRegion(beaconRegion)
+			.fail(console.error)
+			.done();
+
+		// Start ranging.
+		locationManager.stopRangingBeaconsInRegion(beaconRegion)
+			.fail(console.error)
+			.done();
 	}
 }
 

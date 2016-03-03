@@ -23,25 +23,66 @@ var currentPage = 'page-eddystone-default';
 // Check for beacons with an rssi higher than this value
 var rssiLimit = -60; 
 
+// false when scanning is off. true when on.
+var isScanning = false;
+
 eddystone.initialize = function()
 {
 	document.addEventListener(
 		'deviceready',
 		function() { evothings.scriptsLoaded(onDeviceReady) },
 		false);
-	
-	// Display default page
-	gotoPage(currentPage);
 };
 
-// Called as soon as we are ready
 function onDeviceReady()
 {
+	// Not used.
+	// Here you can update the UI to say that
+	// the device (the phone/tablet) is ready
+	// to use BLE and other Cordova functions.
+};
+
+// Called when button is pressed
+eddystone.startStop = function()
+{
+	if(isScanning)
+	{
+		document.getElementById('eddystone-start-stop').innerHTML = 'START EDDYSTONE';
+		stop();
+	}
+	else
+	{
+		document.getElementById('eddystone-start-stop').innerHTML = 'STOP EDDYSTONE';
+		start();
+	}
+};
+
+function start()
+{
+	isScanning = true;
+
+	// Display default page
+	gotoPage(currentPage);
+
 	// Start tracking beacons!
 	setTimeout(startScan, 2000);
 	
 	// Timer that refreshes the display.
 	timer = setInterval(updateBeaconList, 2000);
+};
+
+function stop()
+{
+	isScanning = false;
+
+	// Stop tracking beacons
+	evothings.eddystone.stopScan();
+
+	// Cancel timer
+	clearInterval(timer);
+
+	// Clear screen
+	hidePage(currentPage);
 };
 
 function startScan()
