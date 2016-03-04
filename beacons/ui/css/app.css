@@ -17,3 +17,12 @@
 	overflow:hidden;
 	display:none;
 }
+
+.beacon-list
+{
+	float:left;
+	width:50%;
+	overflow:hidden;
+	text-align: left;
+	font-size: 40%;
+}

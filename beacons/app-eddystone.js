@@ -13,15 +13,16 @@ var timer = null;
 
 // Regions that define which page to show for each beacon.
 var beaconData = {
-	'80:EA:CA:00:00:03': 'page-eddystone-elephant',
-	'81:DD:CA:00:00:03': 'page-eddystone-giraffe'
+	'B0:D8:4A:E8:F0:A6': 'page-eddystone-elephant',
+	'B4:EA:C5:38:4E:0E': 'page-eddystone-giraffe'
 };
 
 // Currently displayed page.
 var currentPage = 'page-eddystone-default';
 
 // Check for beacons with an rssi higher than this value
-var rssiLimit = -60; 
+var rssiLimit = -50; 
+var rssiOffset = -30;
 
 // false when scanning is off. true when on.
 var isScanning = false;
@@ -65,7 +66,7 @@ function start()
 	gotoPage(currentPage);
 
 	// Start tracking beacons!
-	setTimeout(startScan, 2000);
+	setTimeout(startScan, 500);
 	
 	// Timer that refreshes the display.
 	timer = setInterval(updateBeaconList, 2000);
@@ -92,8 +93,12 @@ function startScan()
 		function(beacon)
 		{
 			// Update beacon data.
-			beacon.timeStamp = Date.now();
-			beacons[beacon.address] = beacon;
+			// Only store beacons that are already defined
+			if(beaconData[beacon.address]) 
+			{
+				beacon.timeStamp = Date.now();
+				beacons[beacon.address] = beacon;
+			}
 		},
 		function(error)
 		{
@@ -114,14 +119,7 @@ function getSortedBeaconList(beacons)
 	var beaconList = [];
 	for (var key in beacons)
 	{	
-		// Only store beacons we know
-		for (var address in beaconData)
-		{
-			if(beacons[address])
-			{
-				beaconList.push(beacons[key]);
-			}
-		}
+		beaconList.push(beacons[key]);
 	}
 
 	beaconList.sort(function(beacon1, beacon2)
@@ -142,9 +140,9 @@ function removeOldBeacons()
 	var timeNow = Date.now();
 	for (var key in beacons)
 	{
-		// Only show beacons updated during the last 60 seconds.
+		// Only show beacons updated during the last 12.5 seconds.
 		var beacon = beacons[key];
-		if (beacon.timeStamp - 60000 > timeNow)
+		if ((timeNow - beacon.timeStamp) > 12500)
 		{
 			delete beacons[key];
 		}
@@ -153,35 +151,60 @@ function removeOldBeacons()
 
 function displayBeacon()
 {
+	// Clear beacon list
+	$('#found-eddystone-beacons').empty();
+
 	var sortedList = getSortedBeaconList(beacons);
 
-	if(sortedList.length > 0)
+	if(sortedList.length == 0)
 	{
-		var beacon = sortedList[0]; // We only care about the closest one
-		// console.log('Eddystone: ' + beacon.address + ' RSSI: ' + beacon.rssi);
-		var pageId = beaconData[beacon.address];
-
-		// If the beacon is close and represents a new page, then show the page.
-		if(beacon.rssi >= rssiLimit && currentPage != pageId)
-		{
-			gotoPage(pageId);
-			return;
-		}
-
-		// If the beacon represents the current page but is far away,
-		// then show the default page.
-		if (beacon.rssi < rssiLimit && currentPage == pageId)
-		{
-			gotoPage('page-eddystone-default');
-			return;
-		}
+		gotoPage('page-ibeacon-default');
+		return;
 	}
-	else
+
+	var beacon = sortedList[0]; // We only care about the closest one
+	// console.log('Eddystone: ' + beacon.address + ' RSSI: ' + beacon.rssi);
+
+	// Map the RSSI value to a width in percent for the indicator.
+	var rssiWidth = 1; // Used when RSSI is zero or greater.
+	if (beacon.rssi < -100) { rssiWidth = 100; }
+	else if (beacon.rssi < 0) { rssiWidth = 100 + beacon.rssi; }
+
+	// Create tag to display beacon data.
+	var element = $(
+		'<li>'
+		+	'<strong>Name</strong>: ' + beacon.name + '<br />'
+		+	'<strong>MAC Address</strong>: ' + beacon.address + '<br />'
+		+	'<strong>URL</strong>: ' + beacon.url + '<br />'
+		+	'<strong>NID</strong>: ' + uint8ArrayToString(beacon.nid)+ '<br />'
+		+	'<strong>BID</strong>: ' + uint8ArrayToString(beacon.bid) + '<br />'
+		+	'<strong>Voltage</strong>: ' + beacon.url + '<br />'
+		+	'<strong>Temperature</strong>: ' + beacon.temperature + '<br />'
+		+	'<strong>RSSI</strong>: ' + beacon.rssi + '<br />'
+		+ 	'<div style="background:rgb(128,64,255);height:20px;width:'
+		+ 		rssiWidth + '%;"></div>'
+		+ '</li>'
+	);
+
+	$('#found-eddystone-beacons').append(element);
+
+	var pageId = beaconData[beacon.address];
+
+	// If the beacon is close and represents a new page, then show the page.
+	if(beacon.rssi >= rssiLimit && currentPage != pageId)
 	{
-		// No beacons found, show default page
+		gotoPage(pageId); 
+		return;
+	}
+
+	// If the beacon represents the current page but is far away,
+	// then show the default page.
+	if (beacon.rssi < (rssiLimit + rssiOffset) && currentPage == pageId)
+	{
 		gotoPage('page-eddystone-default');
 		return;
 	}
+
 };
 
 function uint8ArrayToString(uint8Array)

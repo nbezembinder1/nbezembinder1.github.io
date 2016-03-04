@@ -10,23 +10,31 @@ var beaconRegions =
 [
 	{
 		id: 'page-ibeacon-elephant',
-		uuid:'585CDE93-1B01-42CC-9A13-25009BEDC65E',
-		major: 1,
-		minor: 1
+		uuid:'C72C49D7-C103-5F8A-0822-14E7AE986E9F',
+		major: 21017,
+		minor: 8885
 	},
 	{
 		id: 'page-ibeacon-giraffe',
-		uuid:'595CDE93-1B01-42CC-9A13-25009BEDC65E', // Notice the difference in UUID
-		major: 1,
-		minor: 1
+		uuid:'54392FC4-CB60-AB74-CE8E-7679F8F1B916', // Notice the difference in UUID and major/minor
+		major: 7929,
+		minor: 43032
 	}
 ];
+var x = 0;
 
 // Currently displayed page.
 var currentPage = 'page-ibeacon-default';
 
 // Check for beacons with an rssi higher than this value
 var rssiLimit = -60; 
+var rssiOffset = -20;
+
+// Dictonary of beacons.
+var beacons = {};
+
+// Timer that displays a list of beacons.
+var timer = null;
 
 // false when scanning is off. true when on.
 var isScanning = false;
@@ -73,14 +81,25 @@ function start()
 	
 	// Start tracking beacons!
 	startScanForBeacons();
+	
+	// Timer that refreshes the display.
+	timer = setInterval(updateBeaconList, 2000);
 };
 
 function stop()
 {
 	isScanning = false;
 	
+	// Cancel timer
+	clearInterval(timer);
+
 	// Hide the current page
 	hidePage(currentPage);
+	currentPage = 'page-ibeacon-default';
+
+	// Clear beacon list
+	$('#found-ibeacon-beacons').empty();
+	beacons = {};
 
 	// Stop scanning beacons
 	stopScanForBeacons();
@@ -106,8 +125,16 @@ function startScanForBeacons()
 
 	delegate.didRangeBeaconsInRegion = function(pluginResult)
 	{
-		//console.log('didRangeBeaconsInRegion: ' + JSON.stringify(pluginResult))
-		didRangeBeaconsInRegion(pluginResult);
+		// didRangeBeaconsInRegion(pluginResult);
+		for(var i in pluginResult.beacons)
+		{
+			// Insert beacon into table of found beacons
+			var beacon = pluginResult.beacons[i];
+			beacon.identifier = pluginResult.region.identifier; // Store the identifier for future reference
+			beacon.timeStamp = Date.now();
+			var key = beacon.uuid + ':' + beacon.major + ':' + beacon.minor;
+			beacons[key] = beacon;
+		}
 	}
 
 	// Set the delegate object to use.
@@ -133,23 +160,64 @@ function startScanForBeacons()
 	}
 }
 
-// Display pages depending of which beacon is close.
-function didRangeBeaconsInRegion(pluginResult)
+function updateBeaconList()
 {
-	// There must be a beacon within range.
-	if (0 == pluginResult.beacons.length)
+	removeOldBeacons();
+	displayBeacon();
+};
+
+function removeOldBeacons()
+{
+	var timeNow = Date.now();
+	for (var key in beacons)
 	{
+		// Only show beacons updated during the last 12.5 seconds.
+		var beacon = beacons[key];
+		if ((timeNow - beacon.timeStamp) > 12500)
+		{
+			delete beacons[key];
+		}
+	}
+};
+
+function displayBeacon()
+{
+	// Clear beacon list
+	$('#found-ibeacon-beacons').empty();
+
+	var sortedList = getSortedBeaconList(beacons);
+
+	if(sortedList.length == 0)
+	{
+		gotoPage('page-ibeacon-default');
 		return;
 	}
+	
+	var beacon = sortedList[0]; // We want to show extra information for the closest beacon
 
-	// Our regions are defined so that there is one beacon per region.
-	// Get the first (and only) beacon in range in the region.
-	var beacon = pluginResult.beacons[0];
+		// Map the RSSI value to a width in percent for the indicator.
+		var rssiWidth = 1; // Used when RSSI is zero or greater.
+		if (beacon.rssi < -100) { rssiWidth = 100; }
+		else if (beacon.rssi < 0) { rssiWidth = 100 + beacon.rssi; }
+
+	// Create tag to display beacon data.
+	var element = $(
+		'<li>'
+		+	'<strong>UUID</strong>: ' + beacon.uuid + '<br />'
+		+	'<strong>Major</strong>: ' + beacon.major + '<br />'
+		+	'<strong>Minor</strong>: ' + beacon.minor + '<br />'
+		+	'<strong>Proximity</strong>: ' + beacon.proximity + '<br />'
+		+	'<strong>RSSI</strong>: ' + beacon.rssi + '<br />'
+		+ 	'<div style="background:rgb(255,128,64);height:20px;width:'
+		+ 		rssiWidth + '%;"></div>'
+		+ '</li>'
+	);
+
+	$('#found-ibeacon-beacons').append(element);
 
 	// The region identifier is the page id.
-	var pageId = pluginResult.region.identifier;
+	var pageId = beacon.identifier;
 
-	// If the beacon is close and represents a new page, then show the page.
 	if (beacon.rssi >= rssiLimit && currentPage != pageId)
 	{
 		gotoPage(pageId);
@@ -158,7 +226,7 @@ function didRangeBeaconsInRegion(pluginResult)
 
 	// If the beacon represents the current page but is far away,
 	// then show the default page.
-	if (beacon.rssi < rssiLimit && currentPage == pageId)
+	if (beacon.rssi < (rssiLimit + rssiOffset) && currentPage == pageId)
 	{
 		gotoPage('page-ibeacon-default');
 		return;
@@ -186,6 +254,29 @@ function stopScanForBeacons()
 			.done();
 	}
 }
+
+// Map the RSSI value to a value between 1 and 100.
+function mapBeaconRSSI(rssi)
+{
+	if (rssi >= 0) return 1; // Unknown RSSI maps to 1.
+	if (rssi < -100) return 100; // Max RSSI
+	return 100 + rssi;
+};
+
+function getSortedBeaconList(beacons)
+{
+	var beaconList = [];
+	for (var key in beacons)
+	{	
+		beaconList.push(beacons[key]);
+	}
+
+	beaconList.sort(function(beacon1, beacon2)
+	{
+		return mapBeaconRSSI(beacon1.rssi) < mapBeaconRSSI(beacon2.rssi);
+	});
+	return beaconList;
+};
 
 function gotoPage(pageId)
 {
