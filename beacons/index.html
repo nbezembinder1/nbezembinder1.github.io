@@ -16,6 +16,14 @@
 	<script>
 		// Redirect console if running from Evothings Workbench.
 		if (window.hyper) { console.log = hyper.log }
+
+		var toggle = function(element) {
+			var el = document.getElementById(element);
+		  	if (el.style.display === 'block' || el.style.display === '')
+		    	el.style.display = 'none';
+		  	else
+		    	el.style.display = 'block'
+		 };
 	</script>
 
 </head>
@@ -53,46 +61,56 @@
 		</button>
 
 		<div class="container">	
-			<div class="content" id="page-eddystone-default">
-				<h1>Eddystone demo</h1>
-				<p>
-					Please move within range of the Eddystone beacons <br />
-					<strong>RSSI threshold</strong>: -50
-				</p>
+			<div class="eddystone">
+				<button class="red small wide" onclick="toggle('found-eddystone-beacons')" style="font-size:40%";>EDDYSTONE DATA</button>
+
+				<div class="content" id="page-eddystone-default">
+					<h1>Eddystone demo</h1>
+					<p>
+						Please move within range of the Eddystone beacons <br />
+						<strong>RSSI threshold</strong>: -50
+					</p>
+				</div>
+
+				<div class="content" id="page-eddystone-elephant">
+					<h1>Eddystone</h1>
+					<img class="my-header-image" src="photos/picture-elephant.png" />
+				</div>
+
+				<div class="content" id="page-eddystone-giraffe">
+					<h1>Eddystone</h1>
+					<img class="my-header-image" src="photos/picture-giraffe.png" />
+				</div>
+
+				<ul class = "beacon-list dynamic" id="found-eddystone-beacons" style="display:none"></ul>
+
 			</div>
 
-			<div class="content" id="page-eddystone-elephant">
-				<h1>Eddystone</h1>
-				<img class="my-header-image" src="photos/picture-elephant.png" />
+			<div class="ibeacon">
+				<button class="red small wide" onclick="toggle('found-ibeacon-beacons')" style="font-size:40%">IBEACON DATA</button>
+
+				<div class="content" id="page-ibeacon-default">
+					<h1>iBeacon demo</h1>
+					<p>
+						Please move within range of the iBeacon <br />
+						<strong>RSSI threshold</strong>: -50
+					</p>
+				</div>
+
+				<div class="content" id="page-ibeacon-elephant">
+					<h1>iBeacon</h1>
+					<img class="my-header-image" src="photos/picture-elephant.png" />
+				</div>
+
+				<div class="content" id="page-ibeacon-giraffe">
+					<h1>iBeacon</h1>
+					<img class="my-header-image" src="photos/picture-giraffe.png" />
+				</div>
+
+				<ul class = "beacon-list dynamic" id="found-ibeacon-beacons" style="display:none"></ul>
+				
 			</div>
 
-			<div class="content" id="page-eddystone-giraffe">
-				<h1>Eddystone</h1>
-				<img class="my-header-image" src="photos/picture-giraffe.png" />
-			</div>
-
-			<div class="content" id="page-ibeacon-default">
-				<h1>iBeacon demo</h1>
-				<p>
-					Please move within range of the iBeacon <br />
-					<strong>RSSI threshold</strong>: -50
-				</p>
-			</div>
-
-			<div class="content" id="page-ibeacon-elephant">
-				<h1>iBeacon</h1>
-				<img class="my-header-image" src="photos/picture-elephant.png" />
-			</div>
-
-			<div class="content" id="page-ibeacon-giraffe">
-				<h1>iBeacon</h1>
-				<img class="my-header-image" src="photos/picture-giraffe.png" />
-			</div>
-
-			<div style = 'clear:both'></div>
-
-			<ul class = "beacon-list dynamic" id="found-eddystone-beacons"></ul>
-			<ul class = "beacon-list dynamic" id="found-ibeacon-beacons"></ul>
 		</div>
 
 

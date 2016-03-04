@@ -79,12 +79,12 @@ function stop()
 	// Stop tracking beacons
 	evothings.eddystone.stopScan();
 
-	// Clear beacons
-	beacons = {};
-	$('#found-eddystone-beacons').empty();
-
 	// Cancel timer
 	clearInterval(timer);
+
+	// Clear beacon list
+	$('#found-eddystone-beacons').empty();
+	beacons = {};
 
 	// Clear screen
 	hidePage(currentPage);
@@ -138,6 +138,7 @@ function updateBeaconList()
 {
 	removeOldBeacons();
 	displayBeacon();
+	displayBeaconList();
 };
 
 function removeOldBeacons()
@@ -154,11 +155,44 @@ function removeOldBeacons()
 	}
 };
 
-function displayBeacon()
+
+function displayBeaconList()
 {
 	// Clear beacon list
 	$('#found-eddystone-beacons').empty();
 
+	var sortedList = getSortedBeaconList(beacons);
+
+	// Update beacon list.
+	$.each(sortedList, function(key, beacon)
+	{
+		// Map the RSSI value to a width in percent for the indicator.
+		var rssiWidth = 1; // Used when RSSI is zero or greater.
+		if (beacon.rssi < -100) { rssiWidth = 100; }
+		else if (beacon.rssi < 0) { rssiWidth = 100 + beacon.rssi; }
+
+		// Create tag to display beacon data.
+		var element = $(
+			'<li>'
+			+	'<strong>Name</strong>: ' + beacon.name + '<br />'
+			+	'<strong>MAC Address</strong>: ' + beacon.address + '<br />'
+			+	'<strong>URL</strong>: ' + beacon.url + '<br />'
+			+	'<strong>NID</strong>: ' + uint8ArrayToString(beacon.nid)+ '<br />'
+			+	'<strong>BID</strong>: ' + uint8ArrayToString(beacon.bid) + '<br />'
+			+	'<strong>Voltage</strong>: ' + beacon.url + '<br />'
+			+	'<strong>Temperature</strong>: ' + beacon.temperature + '<br />'
+			+	'<strong>RSSI</strong>: ' + beacon.rssi + '<br />'
+			+ 	'<div style="background:rgb(128,64,255);height:20px;width:'
+			+ 		rssiWidth + '%;"></div>'
+			+ '</li>'
+		);
+
+		$('#found-eddystone-beacons').append(element);
+	});
+};
+
+function displayBeacon()
+{
 	var sortedList = getSortedBeaconList(beacons);
 
 	if(sortedList.length == 0)
@@ -169,29 +203,6 @@ function displayBeacon()
 
 	var beacon = sortedList[0]; // We only care about the closest one
 	// console.log('Eddystone: ' + beacon.address + ' RSSI: ' + beacon.rssi);
-
-	// Map the RSSI value to a width in percent for the indicator.
-	var rssiWidth = 1; // Used when RSSI is zero or greater.
-	if (beacon.rssi < -100) { rssiWidth = 100; }
-	else if (beacon.rssi < 0) { rssiWidth = 100 + beacon.rssi; }
-
-	// Create tag to display beacon data.
-	var element = $(
-		'<li>'
-		+	'<strong>Name</strong>: ' + beacon.name + '<br />'
-		+	'<strong>MAC Address</strong>: ' + beacon.address + '<br />'
-		+	'<strong>URL</strong>: ' + beacon.url + '<br />'
-		+	'<strong>NID</strong>: ' + uint8ArrayToString(beacon.nid)+ '<br />'
-		+	'<strong>BID</strong>: ' + uint8ArrayToString(beacon.bid) + '<br />'
-		+	'<strong>Voltage</strong>: ' + beacon.url + '<br />'
-		+	'<strong>Temperature</strong>: ' + beacon.temperature + '<br />'
-		+	'<strong>RSSI</strong>: ' + beacon.rssi + '<br />'
-		+ 	'<div style="background:rgb(128,64,255);height:20px;width:'
-		+ 		rssiWidth + '%;"></div>'
-		+ '</li>'
-	);
-
-	$('#found-eddystone-beacons').append(element);
 
 	var pageId = beaconData[beacon.address];
 

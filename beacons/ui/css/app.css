@@ -8,22 +8,28 @@
 {
 	margin:0;
 	text-align: center;
+	font-size: 80%;
 }
 
 .content 
 {
-	font-size: 80%;
-	float:left;
-	width:50%;
-	overflow:hidden;
 	display:none;
+}
+
+.eddystone
+{
+	float:left;
+	width: 50%;
+}
+
+.ibeacon
+{
+	width:50%;
+	float:right;
 }
 
 .beacon-list
 {
-	float:left;
-	width:50%;
-	overflow:hidden;
 	text-align: left;
 	font-size: 40%;
 }

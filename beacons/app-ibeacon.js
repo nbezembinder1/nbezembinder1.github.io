@@ -27,7 +27,7 @@ var x = 0;
 var currentPage = 'page-ibeacon-default';
 
 // Check for beacons with an rssi higher than this value
-var rssiLimit = -50; 
+var rssiLimit = -60; 
 var rssiOffset = -20;
 
 // Dictonary of beacons.
@@ -164,6 +164,7 @@ function updateBeaconList()
 {
 	removeOldBeacons();
 	displayBeacon();
+	displayBeaconList()
 };
 
 function removeOldBeacons()
@@ -184,7 +185,7 @@ function displayBeacon()
 {
 	// Clear beacon list
 	$('#found-ibeacon-beacons').empty();
-
+	
 	var sortedList = getSortedBeaconList(beacons);
 
 	if(sortedList.length == 0)
@@ -232,6 +233,38 @@ function displayBeacon()
 		return;
 	}
 }
+
+function displayBeaconList()
+{
+	// Clear beacon list
+	$('#found-ibeacon-beacons').empty();
+
+	var sortedList = getSortedBeaconList(beacons);
+
+	// Update beacon list.
+	$.each(sortedList, function(key, beacon)
+	{
+		// Map the RSSI value to a width in percent for the indicator.
+		var rssiWidth = 1; // Used when RSSI is zero or greater.
+		if (beacon.rssi < -100) { rssiWidth = 100; }
+		else if (beacon.rssi < 0) { rssiWidth = 100 + beacon.rssi; }
+
+		// Create tag to display beacon data.
+		var element = $(
+			'<li>'
+			+	'<strong>UUID</strong>: ' + beacon.uuid + '<br />'
+			+	'<strong>Major</strong>: ' + beacon.major + '<br />'
+			+	'<strong>Minor</strong>: ' + beacon.minor + '<br />'
+			+	'<strong>Proximity</strong>: ' + beacon.proximity + '<br />'
+			+	'<strong>RSSI</strong>: ' + beacon.rssi + '<br />'
+			+ 	'<div style="background:rgb(255,128,64);height:20px;width:'
+			+ 		rssiWidth + '%;"></div>'
+			+ '</li>'
+		);
+
+		$('#found-ibeacon-beacons').append(element);
+	});
+};
 
 function stopScanForBeacons()
 {
