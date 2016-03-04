@@ -27,7 +27,7 @@ var x = 0;
 var currentPage = 'page-ibeacon-default';
 
 // Check for beacons with an rssi higher than this value
-var rssiLimit = -60; 
+var rssiLimit = -50; 
 var rssiOffset = -20;
 
 // Dictonary of beacons.

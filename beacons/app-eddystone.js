@@ -79,11 +79,16 @@ function stop()
 	// Stop tracking beacons
 	evothings.eddystone.stopScan();
 
+	// Clear beacons
+	beacons = {};
+	$('#found-eddystone-beacons').empty();
+
 	// Cancel timer
 	clearInterval(timer);
 
 	// Clear screen
 	hidePage(currentPage);
+	currentPage = 'page-eddystone-default';
 };
 
 function startScan()
