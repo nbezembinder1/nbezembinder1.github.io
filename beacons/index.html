@@ -49,6 +49,10 @@
 				<menuitem>
 					<a href="#troubleshooting">Troubleshooting</a>
 				</menuitem>
+
+				<menuitem>
+					<a href="#settings">Settings</a>
+				</menuitem>
 			</menu>
 		</header>
 
@@ -68,7 +72,6 @@
 					<h1>Eddystone demo</h1>
 					<p>
 						Please move within range of the Eddystone beacons <br />
-						<strong>RSSI threshold</strong>: -50
 					</p>
 				</div>
 
@@ -93,7 +96,6 @@
 					<h1>iBeacon demo</h1>
 					<p>
 						Please move within range of the iBeacon <br />
-						<strong>RSSI threshold</strong>: -50
 					</p>
 				</div>
 
@@ -138,6 +140,19 @@
 		</p>
 
 	</section>
+
+	<section id='settings'>
+		<p align='middle' id="rssi-threshold">RSSI threshold: -60</p>
+		<input type="range" id"slider" min="-100" max="0" step="1" onchange="eddystone.setRSSIthreshold(value); ibeacon.setRSSIthreshold(value)" value="-60">
+
+		<p align='middle' id="rssi-offset">RSSI offset: 20</p>
+		<input type="range" id"slider" min="0" max="50" step="1" onchange="eddystone.setRSSIoffset(value); ibeacon.setRSSIoffset(value)" value="20">
+
+		<p>The RSSI threshold defines when to show a different beacon. To increase sensitivity move the slider to the left (decrease RSSI threshold). If the beacons are too close too close to the beacons interfering each other.</p>
+
+		<p>The RSSI offset defines when the beacon is removed from the screen. When the beacon's RSSI is lower than the RSSI threshold and offset combined the beacon is removed. </p>
+	</section>
+
 
 	<script src="lib/jquery.js"></script>
 	<script src="cordova.js"></script>

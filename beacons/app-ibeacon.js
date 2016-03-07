@@ -27,8 +27,8 @@ var x = 0;
 var currentPage = 'page-ibeacon-default';
 
 // Check for beacons with an rssi higher than this value
-var rssiLimit = -60; 
-var rssiOffset = -20;
+var rssiThreshold = -60; 
+var rssiOffset = 20;
 
 // Dictonary of beacons.
 var beacons = {};
@@ -219,7 +219,9 @@ function displayBeacon()
 	// The region identifier is the page id.
 	var pageId = beacon.identifier;
 
-	if (beacon.rssi >= rssiLimit && currentPage != pageId)
+	console.log('beacon: ' + beacon.rssi + ' | ' + 'treshold: ' + rssiThreshold + ' | ' + 'offset: ' + rssiOffset);
+
+	if (beacon.rssi >= rssiThreshold && currentPage != pageId)
 	{
 		gotoPage(pageId);
 		return;
@@ -227,7 +229,7 @@ function displayBeacon()
 
 	// If the beacon represents the current page but is far away,
 	// then show the default page.
-	if (beacon.rssi < (rssiLimit + rssiOffset) && currentPage == pageId)
+	if (beacon.rssi < (rssiThreshold - rssiOffset) && currentPage == pageId)
 	{
 		gotoPage('page-ibeacon-default');
 		return;
@@ -327,6 +329,26 @@ function hidePage(pageId)
 {
 	document.getElementById(pageId).style.display = 'none';
 }
+
+// Called when the RSSI threshold slider is selected
+ibeacon.setRSSIthreshold = function(value)
+{
+	if(value >= -100 && value <= 0)
+	{
+		rssiThreshold = value; // we need time in ms
+		$('#rssi-threshold').html('RSSI threshold: ' + value);
+	}
+};
+
+// Called when the RSSI offset slider is selected
+ibeacon.setRSSIoffset = function(value)
+{
+	if(value >= 0 && value <= 50)
+	{
+		rssiOffset = value; // we need time in ms
+		$('#rssi-offset').html('RSSI offset: ' + value);
+	}
+};
 
 })(); // End of closure
 

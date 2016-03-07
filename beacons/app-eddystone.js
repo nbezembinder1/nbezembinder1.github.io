@@ -21,8 +21,8 @@ var beaconData = {
 var currentPage = 'page-eddystone-default';
 
 // Check for beacons with an rssi higher than this value
-var rssiLimit = -50; 
-var rssiOffset = -30;
+var rssiThreshold = -60; 
+var rssiOffset = 20;
 
 // false when scanning is off. true when on.
 var isScanning = false;
@@ -207,7 +207,7 @@ function displayBeacon()
 	var pageId = beaconData[beacon.address];
 
 	// If the beacon is close and represents a new page, then show the page.
-	if(beacon.rssi >= rssiLimit && currentPage != pageId)
+	if(beacon.rssi >= rssiThreshold && currentPage != pageId)
 	{
 		gotoPage(pageId); 
 		return;
@@ -215,7 +215,7 @@ function displayBeacon()
 
 	// If the beacon represents the current page but is far away,
 	// then show the default page.
-	if (beacon.rssi < (rssiLimit + rssiOffset) && currentPage == pageId)
+	if (beacon.rssi < (rssiThreshold - rssiOffset) && currentPage == pageId)
 	{
 		gotoPage('page-eddystone-default');
 		return;
@@ -254,6 +254,26 @@ function showPage(pageId)
 function hidePage(pageId)
 {
 	document.getElementById(pageId).style.display = 'none';
+};
+
+// Called when the RSSI threshold slider is selected
+eddystone.setRSSIthreshold = function(value)
+{
+	if(value >= -100 && value <= 0)
+	{
+		rssiThreshold = value; // we need time in ms
+		$('#rssi-threshold').html('RSSI threshold: ' + value);
+	}
+};
+
+// Called when the RSSI offset slider is selected
+eddystone.setRSSIoffset = function(value)
+{
+	if(value >= 0 && value <= 50)
+	{
+		rssiOffset = value; // we need time in ms
+		$('#rssi-offset').html('RSSI offset: ' + value);
+	}
 };
 
 })(); // End of closure.
