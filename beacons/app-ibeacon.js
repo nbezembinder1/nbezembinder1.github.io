@@ -219,8 +219,6 @@ function displayBeacon()
 	// The region identifier is the page id.
 	var pageId = beacon.identifier;
 
-	console.log('beacon: ' + beacon.rssi + ' | ' + 'treshold: ' + rssiThreshold + ' | ' + 'offset: ' + rssiOffset);
-
 	if (beacon.rssi >= rssiThreshold && currentPage != pageId)
 	{
 		gotoPage(pageId);

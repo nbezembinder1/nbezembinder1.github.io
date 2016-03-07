@@ -47,11 +47,15 @@
 				</menuitem>
 
 				<menuitem>
-					<a href="#troubleshooting">Troubleshooting</a>
+					<a href="#powerprofiler">Power Profiler</a>
 				</menuitem>
 
 				<menuitem>
 					<a href="#settings">Settings</a>
+				</menuitem>
+
+				<menuitem>
+					<a href="#troubleshooting">Troubleshooting</a>
 				</menuitem>
 			</menu>
 		</header>
@@ -120,6 +124,8 @@
 
 		<h1>Troubleshooting</h1>
 
+		<p><a href="https://github.com/nbezembinder1/nbezembinder1.github.io">Source code</a></p>
+
 		<p>
 			<b>Configured BD addresses:</b></br>
 			'B0:D8:4A:E8:F0:A6': 'page-eddystone-elephant', <br />
@@ -151,6 +157,18 @@
 		<p>The RSSI threshold defines when to show a different beacon. To increase sensitivity move the slider to the left (decrease RSSI threshold). If the beacons are too close too close to the beacons interfering each other.</p>
 
 		<p>The RSSI offset defines when the beacon is removed from the screen. When the beacon's RSSI is lower than the RSSI threshold and offset combined the beacon is removed. </p>
+	</section>
+
+	<section id='powerprofiler'>
+		<h1>Power Profiler</h1>
+
+		<p>The following images show a plot of the current drawn by the chip's battery when advertising both Eddystone and iBeacon format</p>
+		
+		<h2>Eddystone</h2>
+		<img class="my-header-image" src="photos/power-profiler/eddystone.png" />
+
+		<h2>iBeacon</h2>
+		<img class="my-header-image" src="photos/power-profiler/ibeacon.png" />
 	</section>
 
 
