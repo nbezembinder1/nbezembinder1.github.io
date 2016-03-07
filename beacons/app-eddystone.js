@@ -197,7 +197,7 @@ function displayBeacon()
 
 	if(sortedList.length == 0)
 	{
-		gotoPage('page-ibeacon-default');
+		gotoPage('page-eddystone-default');
 		return;
 	}
 
