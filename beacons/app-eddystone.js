@@ -12,9 +12,10 @@ var beacons = {};
 var timer = null;
 
 // Regions that define which page to show for each beacon.
+// Since iOS does not expose any MAC addresses we distinguish Eddystone beacons by NID
 var beaconData = {
-	'B0:D8:4A:E8:F0:A6': 'page-eddystone-elephant',
-	'B4:EA:C5:38:4E:0E': 'page-eddystone-giraffe'
+	'25 d5 9d 55 df ec 62 e6 13 56':'page-eddystone-elephant',
+	'ad 72 f9 c6 39 b9 6a 7c df db':'page-eddystone-giraffe'
 };
 
 // Currently displayed page.
@@ -99,7 +100,7 @@ function startScan()
 		{
 			// Update beacon data.
 			// Only store beacons that are already defined
-			if(beaconData[beacon.address]) 
+			if(beaconData[uint8ArrayToString(beacon.nid)]) 
 			{
 				beacon.timeStamp = Date.now();
 				beacons[beacon.address] = beacon;
@@ -204,7 +205,7 @@ function displayBeacon()
 	var beacon = sortedList[0]; // We only care about the closest one
 	// console.log('Eddystone: ' + beacon.address + ' RSSI: ' + beacon.rssi);
 
-	var pageId = beaconData[beacon.address];
+	var pageId = beaconData[uint8ArrayToString(beacon.nid)];
 
 	// If the beacon is close and represents a new page, then show the page.
 	if(beacon.rssi >= rssiThreshold && currentPage != pageId)
@@ -232,11 +233,14 @@ function uint8ArrayToString(uint8Array)
 	}
 
 	var result = '';
+	var sep = '';
 	for (var i = 0; i < uint8Array.length; ++i)
 	{
-		result += format(uint8Array[i]) + ' ';
+		result += sep + format(uint8Array[i]);
+		sep = ' ';
 	}
 	return result;
+
 };
 
 function gotoPage(pageId)
