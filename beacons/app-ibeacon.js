@@ -54,6 +54,7 @@ function onDeviceReady()
 	// Specify a shortcut for the location manager that
 	// has the iBeacon functions.
 	window.locationManager = cordova.plugins.locationManager;
+	cordova.plugins.locationManager.requestAlwaysAuthorization(); // Required for iOS
 }
 
 // Called when button is pressed
@@ -108,23 +109,24 @@ function stop()
 
 function startScanForBeacons()
 {
-	//console.log('startScanForBeacons')
+	// console.log('startScanForBeacons')
 
 	// The delegate object contains iBeacon callback functions.
 	var delegate = new cordova.plugins.locationManager.Delegate()
 
 	delegate.didDetermineStateForRegion = function(pluginResult)
 	{
-		//console.log('didDetermineStateForRegion: ' + JSON.stringify(pluginResult))
+		// console.log('didDetermineStateForRegion: ' + JSON.stringify(pluginResult))
 	}
 
 	delegate.didStartMonitoringForRegion = function(pluginResult)
 	{
-		//console.log('didStartMonitoringForRegion:' + JSON.stringify(pluginResult))
+		// console.log('didStartMonitoringForRegion:' + JSON.stringify(pluginResult))
 	}
 
 	delegate.didRangeBeaconsInRegion = function(pluginResult)
 	{
+
 		// didRangeBeaconsInRegion(pluginResult);
 		for(var i in pluginResult.beacons)
 		{
