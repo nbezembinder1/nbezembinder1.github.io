@@ -1047,7 +1047,6 @@
 		 */
 		instance.handleCommandReply = function(data)
 		{
-			console.log('handleCommandReply ' + JSON.stringify(data));
 			// Find control based on COMMAND_ID
 			for(key in instance.controls)
 			{
