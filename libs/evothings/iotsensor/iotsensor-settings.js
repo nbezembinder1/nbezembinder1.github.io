@@ -652,6 +652,27 @@
 			PARAMETERS: new Uint8Array(12) // TODO: Set default values
 		}
 
+		/** 
+		 * @description Set the sensor status callback. <br />
+		 * This function is called everytime the sensor receives a START or STOP command and sends a reply back to the device.
+		 * @param {function} callbackFun - Callback called with START/STOP reply (1: START, 0: STOP): callbackFun(data).
+		 * @instance
+		 * @example
+		 * iotsensor.sensorStatusCallback(
+		 * 	function(data)
+		 * 	{
+		 * 		console.log('Sensor status: ' + data);
+		 * 	}
+		 * );
+		 * @public
+		 */
+		instance.sensorStatusCallback = function(callbackFun)
+		{
+			// Set callback function for both STOP and START commands
+			instance.controls.STOP.callbackFun = callbackFun;
+			instance.controls.START.callbackFun = callbackFun;
+		}
+
 		/**
 		 * @description Read parameters from flash memory <br />
 		 * @instance
@@ -1026,6 +1047,7 @@
 		 */
 		instance.handleCommandReply = function(data)
 		{
+			console.log('handleCommandReply ' + JSON.stringify(data));
 			// Find control based on COMMAND_ID
 			for(key in instance.controls)
 			{

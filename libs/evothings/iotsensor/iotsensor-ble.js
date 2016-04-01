@@ -844,6 +844,8 @@
 		 */
 		instance.sensorOff = function(service)
 		{
+			// Do not write 0x00 to CONTROL_POINT. This will disable all other sensors as well.
+
 			// Disable sensor notification
 			service.DATA && instance.device.writeServiceDescriptor(
 				service.SERVICE,
