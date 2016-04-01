@@ -15,7 +15,7 @@ Folder structure:
 To run one of the example applications on your mobile device, install the [Evothings Viewer](https://evothings.com/doc/studio/evothings-viewer.html) and open the [dialog-evothings app](https://nbezembinder1.github.io/dialog/dialog-evothings/index.html) using the browser on your smartphone.
 
 
-## apps
+## Apps
 Several applications are built using [Evothings Studio](http://evothings.com/). The source can be found in the [apps directory](dialog/apps).
 
 ### [blinky](dialog/apps/blinky)
@@ -29,7 +29,7 @@ The Bluetooth device is able to broadcast multiple beacon formats such as Eddyst
 Coming soon
 
 
-## libraries
+## Libraries
 This [folder](dialog/libs) contains several JavaScript libraries used or created during the project. 
 
 ### easyble
@@ -40,7 +40,7 @@ JavaScript library used to communicate with the [IoT Sensor Development Kit](htt
 
 TODO: Add more information
 
-## documentation
+## Documentation
 Documentation for both example applications and libraries can be found on [github.io](http://nbezembinder1.github.io/dialog/docs/iotsensor-library/index.html)
 
 TODO: Create an index page on [github.io](http://nbezembinder1.github.io/dialog/docs)
