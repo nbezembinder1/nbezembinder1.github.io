@@ -99,7 +99,7 @@ evothings.iotsensor.createGenericInstance = function()
 	/**
 	 * @description <strong>RAW and SFL</strong> <br /> Set the accelerometer notification callback. This function is called everytime new data is available. <br />
 	 * Data is returned in g (x, y, z)
-	 * @param {function} callbackFun - Callback called with running status: callbackFun(data).
+	 * @param {function} callbackFun - Callback called with accelerometer data: callbackFun(data).
 	 * @instance
 	 * @example
 	 * iotsensor.accelerometerCallback(
@@ -121,7 +121,7 @@ evothings.iotsensor.createGenericInstance = function()
 	/**
 	 * @description <strong>RAW and SFL</strong> <br /> Set the gyroscope notification callback. This function is called everytime new data is available. <br />
 	 * Data is returned in degrees per second (x, y, z)
-	 * @param {function} callbackFun - Callback called with running status: callbackFun(data).
+	 * @param {function} callbackFun - Callback called with gyroscope data: callbackFun(data).
 	 * @instance
 	 * @example
 	 * iotsensor.gyroscopeCallback(
@@ -143,7 +143,7 @@ evothings.iotsensor.createGenericInstance = function()
 	/**
 	 * @description <strong>RAW and SFL</strong> <br /> Set the magnetometer notification callback. This function is called everytime new data is available.<br />
 	 * Data is returned in micro Tesla (x, y, z)
-	 * @param {function} callbackFun - Callback called with running status: callbackFun(data).
+	 * @param {function} callbackFun - Callback called with magnetometer data: callbackFun(data).
 	 * @instance
 	 * @example
 	 * iotsensor.magnetometerCallback(
@@ -165,7 +165,7 @@ evothings.iotsensor.createGenericInstance = function()
 	/**
 	 * @description <strong>RAW and SFL</strong> <br /> Set the barometer notification callback. This function is called everytime new data is available. <br />
 	 * Data is returned in Pascal (whole number)
-	 * @param {function} callbackFun - Callback called with running status: callbackFun(data).
+	 * @param {function} callbackFun - Callback called with barometer data: callbackFun(data).
 	 * @instance
 	 * @example
 	 * iotsensor.barometerCallback(
@@ -184,7 +184,7 @@ evothings.iotsensor.createGenericInstance = function()
 	/**
 	 * @description <strong>RAW and SFL</strong> <br /> Set the temperature notification callback. This function is called everytime new data is available.<br />
 	 * Data is returned in degrees Celcius (2 decimals)
-	 * @param {function} callbackFun - Callback called with running status: callbackFun(data).
+	 * @param {function} callbackFun - Callback called with temperature data: callbackFun(data).
 	 * @instance
 	 * @example
 	 * iotsensor.temperatureCallback(
@@ -203,7 +203,7 @@ evothings.iotsensor.createGenericInstance = function()
 	/**
 	 * @description <strong>RAW and SFL</strong> <br /> Set the humidity notification callback. This function is called everytime new data is available. <br />
 	 * Data is returned in % (whole number)
-	 * @param {function} callbackFun - Callback called with running status: callbackFun(data).
+	 * @param {function} callbackFun - Callback called with humidity data: callbackFun(data).
 	 * @instance
 	 * @example
 	 * iotsensor.humidityCallback(
@@ -222,7 +222,7 @@ evothings.iotsensor.createGenericInstance = function()
 	/**
 	 * @description <strong>SFL only</strong> <br /> Set the sensor fusion notification callback. This function is called everytime new data is available. <br />
 	 * Data is returned in 4 axis (w, x, y, z)
-	 * @param {function} callbackFun - Callback called with running status: callbackFun(data).
+	 * @param {function} callbackFun - Callback called with sensor fusion data: callbackFun(data).
 	 * @instance
 	 * @example
 	 * iotsensor.sflCallback(
