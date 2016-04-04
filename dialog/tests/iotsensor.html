@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no,
+		shrink-to-fit=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+
+	<title>IoT Sensor Test</title>
+
+	<script>
+		// Redirect console.log to Evothings Workbench.
+		if (window.hyper && window.hyper.log) { console.log = hyper.log }
+	</script>
+	<script src="cordova.js"></script>
+	<script src="libs/evothings/evothings.js"></script>
+	<script src="libs/evothings/iotsensor/iotsensor.js"></script>
+
+</head>
+
+<body>
+
+<div id="main" style="display:none">
+
+	<h1>IoT Sensor Test</h1>
+	<p>
+		Start the test by pressing the connect button. Make sure the IoT Sensor is powered on and advertising (blue LED blinking). <br />
+		Also check if the type of sensor (RAW or SFL) is correctly set below. 
+	</p>
+	<button onclick="startTest()">Connect</button> <br />
+	<button onclick="resetTest()">Reset</button> <br />
+	<div id="tests" style="display:none">
+		<a id="displaySensors" href="javascript:toggle('sensors');"><h2>Sensors</h2></a>
+		<div id="sensors" style="display:none">
+			<p>
+				The following buttons will start a sensor test. The output of the sensor is printed a few times and the sensor is then turned off. <br />
+				Note that 'Sensor Fusion' is not available when connecting to IoT Sensor RAW. <br />
+				Also, if sensor combination is not set to '_all', not every sensor can be tested.
+			</p>
+			<button onclick="testAccelerometer(10)">Accelerometer</button> <br />
+			<button onclick="testGyroscope(10)">Gyroscope</button> <br />
+			<button onclick="testMagnetometer(10)">Magnetometer</button> <br />
+			<button onclick="testBarometer(10)">Barometer</button> <br />
+			<button onclick="testTemperature(10)">Temperature</button> <br />
+			<button onclick="testHumidity(10)">Humidity</button> <br />
+			<button onclick="testSfl(10)">Sensor Fusion</button> <br />
+		</div>
+
+		<a id="displayBasicConfiguration" href="javascript:toggle('basicconfiguration');"><h2>Basic configuration</h2></a>
+		<div id="basicconfiguration" style="display:none">
+			<p>
+				'Random configuration' will set a random configuration in the device. <br />
+				Using 'Get configuration' the current configuration in the device will be printed. <br />
+				'Store in flash' will store the basic configuration in flash memory. To test if the configuration is correctly set: restart the device and re-connect, then print the configuration using 'Get configuration'.
+			</p>
+			<button onclick="testRandomBasicConfiguration()">Random configuration</button>
+			<button onclick="testGetBasicConfiguration()">Get configuration</button>
+			<button onclick="testStoreBasicConfigurationInFlash()">Store in flash</button>
+			<button onclick="testResetConfiguration()">Reset configuration</button>
+		</div>
+
+		<a id="displayCalibration" href="javascript:toggle('calibration');"><h2>Calibration</h2></a>
+		<div id="calibration" style="display:none">
+			<p>
+				'Random Sfl Coefficients' will set random sfl coefficients in the device. <br />
+				'Random Calibration and Control' will randomly set calibration coefficients and control flags in the device. <br />
+				Using 'Get calibration' the current Sfl and Calibration configuration in the device will be printed. <br />
+				'Store Sfl and Calibration configuration' will store the Sfl coefficients and calibration settings in flash memory. To test if the coefficients and calibration is correctly set: restart the device and re-connect, then print the configuration using 'Get calibration'
+			</p>
+			<button onclick="testRandomSflCoefficients()">Random Sfl Coefficients</button>
+			<button onclick="testRandomCalibrationAndControl()">Random Calibration and Control</button>
+			<button onclick="testGetSflAndCalibration()">Get calibration</button>
+			<button onclick="testStoreSflAndCalibrationConfiguration()">Store Sfl and Calibration configuration</button>
+			<button onclick="testResetSflAndCalibrationConfiguration()">Reset Sfl and Calibration</button>
+		</div>
+
+		<a id="displayOther" href="javascript:toggle('other');"><h2>Other</h2></a>
+		<div id="other" style="display:none">
+			<button onclick="deviceInfoTest()">Firmware / Availability</button>
+			<button onclick="testConnectClose(3)">Test connection</button>
+			<button onclick="testRunningStatus()">Running status</button>
+		</div>
+
+	</div>
+
+	<div><pre id="output"></pre></div>
+
+</div>
+
+<script>
+
+// Text output
+var gTestLogData = '';
+
+// IoT Sensor object.
+var iotsensor = null;
+
+// Device type we are connecting to, can either be RAW or SFL
+var type = evothings.iotsensor.SFL;
+
+// Call initialize() as soon as device is ready
+document.addEventListener(
+	'deviceready',
+	function() { evothings.scriptsLoaded(initialize) },
+	false
+);
+
+function initialize()
+{			
+	// Now we are ready
+	document.getElementById("main").style.display="block";
+}
+
+function display(text)
+{
+	var element = document.getElementById('output');
+	element.innerHTML = text;
+}
+
+function testLog(message)
+{
+	console.log(message);
+
+	if(message.indexOf('FAIL') > -1)
+	{
+		message = '<span style="color:rgb(255,0,0)">' + message + '</span>';
+	}
+	else if(message.indexOf('PASS') > -1)
+	{
+		message = '<span style="color:rgb(0,255,0)">' + message + '</span>';
+	}
+
+	gTestLogData += message + '\n';
+	display(gTestLogData);
+	window.scrollTo(0, document.body.scrollHeight); // Automatically scroll down to bottom on new log message
+}
+
+function errorFun(error)
+{
+	testLog(evothings.iotsensor.currentTime() + ' FAIL: ' + error);
+}
+
+function statusFun(status)
+{
+	testLog(evothings.iotsensor.currentTime() + ' ' + status);
+}
+
+function sensorFun(data)
+{
+	testLog(evothings.iotsensor.currentTime() + ' Sensor status: ' + data);
+}
+
+function closeDevice()
+{
+	testLog('Disconnecting device');
+	iotsensor.disconnectDevice();
+}
+
+// Main entry point for tests.
+function startTest()
+{
+	gTestLogData = '',
+	iotsensor = null;
+
+	testLog('Starting test');
+
+	// Create a new IoT Sensor SFL instance
+	testLog('Creating IoT Sensor instance (' + type + ')');
+	iotsensor = evothings.iotsensor.createInstance(type);
+
+	// Set error/status handler function
+	iotsensor
+		.errorCallback(errorFun)
+		.statusCallback(statusFun)
+		.sensorStatusCallback(sensorFun);
+
+	// Make sure we are not connected
+	iotsensor.disconnectDevice(); 
+
+	// Scan/connect and start first test
+	testConnect();
+}
+
+function resetTest()
+{
+	testLog('Resetting...');
+	window.location.reload(true);
+}
+
+function testConnect() 
+{
+	// connect to iot sensor
+	iotsensor.connectToClosestSensor(
+		3000, 
+		function() { 
+			document.getElementById("tests").style.display="block"; // Show all available tests
+			testLog('PASS testConnect, device is connected') 
+		},
+		function(error)
+		{
+			document.getElementById("tests").style.display="none"; // Hide all available tests
+			testLog('FAIL: testConnect error: ' + error);
+			testLog('Try to start test again');
+		}
+	);
+}
+
+// Connect and close <x> times
+function testConnectClose(counter)
+{
+	closeDevice(); // Close device before we try to connect
+	if(counter > 0)
+	{
+		iotsensor.connectToClosestSensor(
+			3000, 
+			function() 
+			{ 
+				counter--;
+				testConnectClose(counter);
+			},
+			function(error)
+			{
+				testLog('FAIL: testConnectClose error: ' + error);
+				testLog('Try to start test again');
+			}
+		);
+	}
+	else
+	{
+		testLog('PASS: testConnectClose device');
+	}
+}
+
+function testAccelerometer(counter)
+{
+	testLog('Testing accelerometer');
+	iotsensor
+		.accelerometerCallback(handleReply)
+		.accelerometerOn();
+
+	function handleReply(data)
+	{
+		if(counter > 0)
+		{
+			counter--;
+			testLog('Accelerometer:' 
+				+ ' x: ' + data.x 
+				+ ' y: ' + data.y 
+				+ ' z: ' + data.z);
+		}
+		else
+		{
+			iotsensor.accelerometerOff();
+			testLog('PASS: testAccelerometer');
+		}
+	}
+}
+
+function testGyroscope(counter)
+{
+	testLog('Testing gyroscope');
+	iotsensor
+		.gyroscopeCallback(handleReply)
+		.gyroscopeOn();
+
+	function handleReply(data)
+	{
+		if(counter > 0)
+		{
+			counter--;
+			testLog('Gyroscope:' 
+				+ ' x: ' + data.x 
+				+ ' y: ' + data.y 
+				+ ' z: ' + data.z);
+		}
+		else
+		{
+			iotsensor.gyroscopeOff();
+			testLog('PASS: testGyroscope');
+		}
+	}
+}
+
+function testMagnetometer(counter)
+{
+	testLog('Testing magnetometer');
+	iotsensor
+		.magnetometerCallback(handleReply)
+		.magnetometerOn();
+
+	function handleReply(data)
+	{
+		if(counter > 0)
+		{
+			counter--;
+			testLog('Magnetometer:' 
+				+ ' x: ' + data.x 
+				+ ' y: ' + data.y 
+				+ ' z: ' + data.z);
+		}
+		else
+		{
+			iotsensor.magnetometerOff();
+			testLog('PASS: testMagnetometer');
+		}
+	}
+}
+
+function testBarometer(counter)
+{
+	testLog('Testing barometer');
+	iotsensor
+		.barometerCallback(handleReply)
+		.barometerOn();
+
+	function handleReply(data)
+	{
+		if(counter > 0)
+		{
+			counter--;
+			testLog('Barometer: ' + data + ' Pa');
+		}
+		else
+		{
+			iotsensor.barometerOff();
+			testLog('PASS: testBarometer');
+		}
+	}	
+}
+
+function testHumidity(counter)
+{
+	testLog('Testing humidity');
+	iotsensor
+		.humidityCallback(handleReply)
+		.humidityOn();
+
+	function handleReply(data)
+	{
+		if(counter > 0)
+		{
+			counter--;
+			testLog('Humidity: ' + data + '%');
+		}
+		else
+		{
+			iotsensor.humidityOff();
+			testLog('PASS: testHumidity');
+		}
+	}	
+}
+
+function testTemperature(counter)
+{
+	testLog('Testing temperature');
+	iotsensor
+		.temperatureCallback(handleReply)
+		.temperatureOn();
+
+	function handleReply(data)
+	{
+		if(counter > 0)
+		{
+			counter--;
+			testLog('Temperature: ' + data + ' degrees');
+		}
+		else
+		{
+			iotsensor.temperatureOff();
+			testLog('PASS: testTemperature');
+		}
+	}
+}
+
+function testSfl(counter)
+{
+	testLog('Testing sfl');
+	iotsensor
+		.sflCallback(handleReply)
+		.sflOn();
+
+	function handleReply(data)
+	{
+		if(counter > 0)
+		{
+			counter--;
+			testLog('Sensor fusion '
+				+ ' w: ' + data.w 
+				+ ' x: ' + data.x 
+				+ ' y: ' + data.y 
+				+ ' z: ' + data.z);
+		}
+		else
+		{
+			iotsensor.sflOff();
+			testLog('PASS: testSfl');
+		}
+	}
+}
+
+function testRandomBasicConfiguration()
+{
+	// http://stackoverflow.com/a/6643460/4354088
+	function randomKey(obj)
+	{
+		var ret;
+		var c = 0;
+		for(var key in obj)
+			if(Math.random() < 1/++c)
+				ret = key
+		return ret;
+	}
+
+	testLog('Testing set random basic configuration');
+
+	// Retrieve al possible combinations
+	var sensor_combinations 		= iotsensor.enums.SENSOR_COMBINATION;
+	var accelerometer_ranges		= iotsensor.enums.ACCELEROMETER_RANGE;
+	var accelerometer_rates 		= iotsensor.enums.ACCELEROMETER_RATE;
+	var gyroscope_ranges 			= iotsensor.enums.GYROSCOPE_RANGE;
+	var gyroscope_rates 			= iotsensor.enums.GYROSCOPE_RATE;
+	var environmental_sensors_rates = iotsensor.enums.ENVIRONMENTAL_SENSORS_RATE;
+	var sensor_fusion_rates 		= iotsensor.enums.SENSOR_FUSION_RATE;
+	var sensor_fusion_raw_data 		= iotsensor.enums.SENSOR_FUSION_RAW_DATA_ENABLE;
+	var calibration_modes 			= iotsensor.enums.CALIBRATION_MODE;
+	var auto_calibration_modes 		= iotsensor.enums.AUTO_CALIBRATION_MODE;
+
+	// Set a random value in iotsensor.configuration.BASIC
+	iotsensor.configuration.BASIC.SENSOR_COMBINATION 			= sensor_combinations[randomKey(sensor_combinations)];
+	iotsensor.configuration.BASIC.ACCELEROMETER_RANGE 			= accelerometer_ranges[randomKey(accelerometer_ranges)]; 
+	iotsensor.configuration.BASIC.ACCELEROMETER_RATE 			= accelerometer_rates[randomKey(accelerometer_rates)];
+	iotsensor.configuration.BASIC.GYROSCOPE_RANGE 				= gyroscope_ranges[randomKey(gyroscope_ranges)];
+	iotsensor.configuration.BASIC.GYROSCOPE_RATE 				= gyroscope_rates[randomKey(gyroscope_rates)];
+	iotsensor.configuration.BASIC.ENVIRONMENTAL_SENSORS_RATE 	= environmental_sensors_rates[randomKey(environmental_sensors_rates)];
+	iotsensor.configuration.BASIC.SENSOR_FUSION_RATE 			= sensor_fusion_rates[randomKey(sensor_fusion_rates)];
+	iotsensor.configuration.BASIC.SENSOR_FUSION_RAW_DATA_ENABLE = sensor_fusion_raw_data[randomKey(sensor_fusion_raw_data)];
+	iotsensor.configuration.BASIC.CALIBRATION_MODE 				= calibration_modes[randomKey(calibration_modes)];
+	iotsensor.configuration.BASIC.AUTO_CALIBRATION_MODE 		= auto_calibration_modes[randomKey(auto_calibration_modes)];
+
+	testLog('Sending random configuration to device');
+
+	// Set basic configuration in device
+	iotsensor.setBasicConfiguration();
+
+	testLog('PASS: testRandomBasicConfiguration');
+}
+
+function testGetBasicConfiguration()
+{
+	testLog('Testing get basic configuration')
+	iotsensor.readBasicConfiguration(handleReply);
+
+	function handleReply(data)
+	{
+        testLog('Basic configuration:'
+                + '\n Sensor combination:         ' + data.SENSOR_COMBINATION
+                + '\n Accelerometer range:        ' + data.ACCELEROMETER_RANGE
+                + '\n Accelerometer rate:         ' + data.ACCELEROMETER_RATE
+                + '\n Gyroscope range:            ' + data.GYROSCOPE_RANGE
+                + '\n Gyroscope rate:             ' + data.GYROSCOPE_RATE
+                + '\n Magnetometer rate:          ' + data.MAGNETOMETER_RATE
+                + '\n Environmental sensors rate: ' + data.ENVIRONMENTAL_SENSORS_RATE
+                + '\n Sensor fusion rate:         ' + data.SENSOR_FUSION_RATE
+                + '\n Sensor fusion raw data:     ' + data.SENSOR_FUSION_RAW_DATA_ENABLE
+                + '\n Calibration mode:           '	+ data.CALIBRATION_MODE
+                + '\n Auto calibration mode:      '	+ data.AUTO_CALIBRATION_MODE);
+		
+		testLog('PASS: testGetBasicConfiguration');
+	}
+}
+
+function testStoreBasicConfigurationInFlash()
+{
+	testLog('Testing store basic configuration in flash')
+	testLog('Storing basic configuration in flash')
+	iotsensor.storeBasicConfigurationInFlash();
+	testLog('PASS: testStoreBasicConfigurationInFlash');
+}
+
+function testResetConfiguration()
+{
+	testLog('Testing configuration reset')
+	iotsensor.resetToFactoryDefaults();
+	testLog('Basic configuration restored');
+	testLog('PASS: testResetConfiguration');
+}
+
+function testRandomSflCoefficients()
+{
+	// Set a random number between 0 and 32768
+	iotsensor.configuration.SFL_COEF.BETA_A = Math.floor((Math.random() * 32768)); 
+	iotsensor.configuration.SFL_COEF.BETA_M = Math.floor((Math.random() * 32768)); 
+
+	testLog('Sending random Sfl coefficients to device');
+
+	// Set Sfl coefficients in device
+	iotsensor.setSflCoefficients();
+
+	testLog('PASS: testRandomSflCoefficients');
+}
+
+function testRandomCalibrationAndControl()
+{
+	// TODO add random configuration.CAL_COEF and configuration.CAL_CONTROL
+}
+
+function testGetSflAndCalibration()
+{
+	testLog('Testing get Sfl and Calibration configuration')
+	iotsensor.readSflCoefficients(handleSfl);
+	iotsensor.readCalibrationCoefficients(handleCalibrationCoefficients);
+	iotsensor.readCalibrationControl(handleCalibrationControl);
+
+	function handleSfl(data)
+	{
+        testLog('Sfl coefficients:'
+                + '\n Beta A:             ' + data.BETA_A
+                + '\n Beta M:             ' + data.BETA_M
+                + '\n Temperature Report: ' + data.TEMPERATURE_REPORT);
+		
+		testLog('PASS: testGetSflCoefficients');
+	}
+
+	function handleCalibrationCoefficients(data)
+	{
+        testLog('Calibration coefficients:'
+                + '\n Sensor Type:   ' + data.SENSOR_TYPE
+                + '\n Q Format:      ' + data.Q_FORMAT
+                + '\n Offset Vector: ' + Array.from(data.OFFSET_VECTOR).toString()
+                + '\n Matrix[0]:     ' + Array.from(data.MATRIX[0]).toString()
+                + '\n Matrix[1]:     ' + Array.from(data.MATRIX[1]).toString()
+                + '\n Matrix[2]:     ' + Array.from(data.MATRIX[2]).toString());
+		
+		testLog('PASS: testGetCalibrationCoefficients');
+	}
+
+	function handleCalibrationControl(data)
+	{
+        testLog('Calibration control values:'
+                + '\n Sensor Type:   ' + data.SENSOR_TYPE
+                + '\n Control Flags: ' + Array.from(data.CONTROL_FLAGS).toString()
+                + '\n Parameters:    ' + Array.from(data.PARAMETERS).toString());
+
+		testLog('PASS: testGetCalibrationControlFlags');
+	}
+}
+
+function testStoreSflAndCalibrationConfiguration()
+{
+	testLog('Testing store sfl and calibration configuration in flash');
+	testLog('Storing sfl and calibration configuration in flash');
+	iotsensor.storeCalibrationAndControl();
+	testLog('PASS: testStoreSflAndCalibrationConfiguration');
+}
+
+function testResetSflAndCalibrationConfiguration()
+{
+	testLog('Testing sfl and calibration reset')
+	iotsensor.resetSflAndCalibrationConfiguration();
+	testLog('Sfl and Calibration configuration restored');
+	testLog('PASS: testStoreSflAndCalibrationConfiguration');
+}
+
+function deviceInfoTest()
+{
+	testLog('Testing device info');
+
+	testLog("Device model: " 	+ iotsensor.getDeviceModel());
+	testLog("Firmware: " 		+ iotsensor.getFirmwareString());
+	testLog("  Accelerometer: " + iotsensor.isAccelerometerAvailable());
+	testLog("  Gyroscope:     " + iotsensor.isGyroscopeAvailable());
+	testLog("  Magnetometer:  " + iotsensor.isMagnetometerAvailable());
+	testLog("  Barometer:     " + iotsensor.isBarometerAvailable());
+	testLog("  Temperature:   " + iotsensor.isTemperatureAvailable());
+	testLog("  Humidity:      " + iotsensor.isHumidityAvailable());
+	testLog("  Sensor Fusion: " + iotsensor.isSflAvailable());
+
+}
+
+function testRunningStatus()
+{
+	testLog('Testing running status');
+	iotsensor.getRunningStatus(handleReply);
+
+	function handleReply(data)
+	{
+		testLog('Running status: ' + data);
+		testLog('PASS: testRunningStatus');
+	}
+}
+
+function toggle(elementId)
+{
+	var el = document.getElementById(elementId);
+	if(el.style.display == "block")
+	{
+		el.style.display = "none";
+	}
+	else{
+		el.style.display = "block";
+	}
+}
+
+</script>
+
+</body>
+
+</html>
