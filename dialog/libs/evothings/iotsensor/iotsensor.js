@@ -612,6 +612,18 @@ evothings.iotsensor.createGenericInstance = function()
 		return instance;
 	}
 
+	/**
+	 * @description <strong>RAW and SFL</strong> <br /> Turn off all sensors.
+	 * @instance
+	 * @example
+	 * iotsensor.disableAllSensors();
+	 * @public
+	 */
+	 instance.disableAllSensors = function()
+	 {
+	 	return instance;
+	 }
+
 	return instance;
 }
 

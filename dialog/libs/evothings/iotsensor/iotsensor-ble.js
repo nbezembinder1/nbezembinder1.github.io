@@ -43,12 +43,6 @@
 	status.IOTSENSOR_FOUND = 'IOTSENSOR_FOUND';
 
 	/**
-	 * @description Scanning timed out, no device found.
-	 * @public
-	 */
-	status.IOTSENSOR_NOT_FOUND = 'IOTSENSOR_NOT_FOUND';
-
-	/**
 	 * @description Connecting to physical device.
 	 * @public
 	 */
@@ -110,6 +104,12 @@
 	 * @public
 	 */
 	error.CONNECTION_LOST = 'CONNECTION_LOST';
+
+	/**
+	 * @description Scanning timed out, no device found.
+	 * @public
+	 */
+	error.IOTSENSOR_NOT_FOUND = 'IOTSENSOR_NOT_FOUND';
 
 	/**
 	 * Create an IoTSensor instance.
@@ -356,7 +356,7 @@
 						if(Object.keys(devices).length === 0)
 						{
 							evothings.easyble.stopScan();
-							instance.callErrorCallback(iotsensor.status.IOTSENSOR_NOT_FOUND);
+							instance.callErrorCallback(iotsensor.error.IOTSENSOR_NOT_FOUND);
 						}
 					},
 					timeOut
@@ -788,6 +788,25 @@
 			instance.sensorOff(instance.HUMIDITY);
 			return instance;
 		}
+
+		/**
+		 * @description RAW and SFL. Implementation of {@link evothings.iotsensor.instance#disableAllSensors}
+		 * @instance
+		 * @example
+		 * iotsensor.disableAllSensors();
+		 * @public
+		 */
+		 instance.disableAllSensors = function()
+		 {
+		 	// Write 0x00 to CONTROL_POINT
+			instance.device.writeServiceCharacteristic(
+				instance.DEVICE_INFO_SERVICE,
+				instance.CONTROL_POINT,
+				new Uint8Array([0,0]),
+				function() {},
+				instance.errorFun
+			);
+		 }
 
 		/**
 		 * @description Internal. Used internally as a helper function to turn on 

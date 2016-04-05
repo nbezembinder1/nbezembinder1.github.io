@@ -430,6 +430,7 @@
 		/**
 		 * @instance.enums
 		 * @description Sensor Fusion Raw Data Enable - Default: Enabled (1)
+		 * <pre><b>NOTE: Disabling Sensor Fusion Raw Data disables to possibility to read Accelerometer, Gyroscope and Magnetometer</b></pre>
 		 * <pre>
 		 *  _disabled: Disabled
 		 *  _enabled:  Enabled
@@ -526,11 +527,11 @@
 		 * // Optional - Store basic configuration in flash
 		 * iotsensor.storeBasicConfigurationInFlash();
 		 *
-		 * // Retrieve new settings from device
+		 * // Optional - Retrieve new settings from device
 		 * iotsensor.readBasicConfiguration(
 		 * 	function(data)
 		 * 	{
-		 *  	console.log('Settings: ' + data);
+		 *      console.log('Settings: ' + data);
 		 * 	}
 		 * );
 		 */
@@ -686,7 +687,7 @@
 		}
 
 		/**
-		 * @description Reset to factory defaults. All settings are restored.
+		 * @description Reset to factory defaults. All settings from iotsensor.configuration.BASIC are restored.
 		 * @instance
 		 * @example
 		 * iotsensor.resetToFactoryDefaults();
