@@ -37,7 +37,7 @@ iotsensor.connectToClosestSensor(
   }
 );
 ```
-You can also connect to a device manually, see the [documentation](http://nbezembinder1.github.io/dialog/docs/iotsensor-library/evothings.iotsensor.instance_ble.html#connectToDevice__anchor) for more information.
+You can also connect to a device manually, see the [documentation](http://nbezembinder1.github.io/dialog/docs/evothings.iotsensor.instance_ble.html#connectToDevice__anchor) for more information.
 ```javascript
 iotsensor.startScanningForDevices(
     function(device)
@@ -94,7 +94,7 @@ function handleReply(data)
               '\n z: ' + data.z);
 }
 ```
-Note: All data (except for Sensor Fusion) is automatically converted to the correct unit of measurement. Please refer to the [documentation](http://nbezembinder1.github.io/dialog/docs/iotsensor-library/evothings.iotsensor.instance.html#accelerometerCallback__anchor) for more information
+Note: All data (except for Sensor Fusion) is automatically converted to the correct unit of measurement. Please refer to the [documentation](http://nbezembinder1.github.io/dialog/docs/evothings.iotsensor.instance.html#accelerometerCallback__anchor) for more information
 
 ## Settings
 Using this JavaScript library the IoT Sensor can be configured to your liking. 
@@ -108,7 +108,7 @@ The settings of the device can be divided into three categories:
         Set calibration coefficients
         Set calibration control flags
 
-For a complete overview of all available settings, refer to the [documentation](http://nbezembinder1.github.io/dialog/docs/iotsensor-library/evothings.iotsensor.instance_settings.html).
+For a complete overview of all available settings, refer to the [documentation](http://nbezembinder1.github.io/dialog/docs/evothings.iotsensor.instance_settings.html).
 
 ### Basic configuration
 
@@ -116,7 +116,7 @@ For a complete overview of all available settings, refer to the [documentation](
     in case the settings in flash memory do not match the default settings specified in configuration.BASIC
     
 The `configuration.BASIC` object is an array and contains eleven different settings to control the sensors. 
-In order to set correct values in the device, refer to the [enums](http://nbezembinder1.github.io/dialog/docs/iotsensor-library/evothings.iotsensor.instance_settings.html) object. These objects contain all possible values that can be written to the device. Currently there is no check build in to make sure you are not writing wrong values to the device.
+In order to set correct values in the device, refer to the [enums](http://nbezembinder1.github.io/dialog/docs/evothings.iotsensor.instance_settings.html) object. These objects contain all possible values that can be written to the device. Currently there is no check build in to make sure you are not writing wrong values to the device.
 ```javascript
 // Change accelerometer range to 16g
 iotsensor.configuration.BASIC.ACCELEROMETER_RANGE = iotsensor.enums.ACCELEROMETER_RANGE._16g;
