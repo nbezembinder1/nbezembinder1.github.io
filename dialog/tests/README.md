@@ -26,3 +26,10 @@ The file iotsensor.html contains the following options to test the [IoT Sensor D
         Running status:          Print running status
 
 To run the test, create a new application in the Evothings Workbench. Copy `iotsensor.html` to the root of the application and rename it to `index.html`.
+
+Download and install the firmware from [Dialog Semiconductor customer support](http://support.dialog-semiconductor.com/) site on your IoT Sensor.
+
+In the html file, change the variable `type` to `evothings.iotsensor.SFL` or `evothings.iotsensor.RAW`, depending on the firmware you are using.
+
+Connect your mobile device to the workbench, save your changes and run the test.
+
