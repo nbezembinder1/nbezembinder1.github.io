@@ -154,12 +154,15 @@ var app = (function()
 				// Create tag for device data.
 				var element = $(
 					'<li >'
-					+	'<strong>' + device.name + '</strong><br />'
+					+	'<strong>' + device.name + '</strong> <br />'
 					// Do not show address on iOS since it can be confused
 					// with an iBeacon UUID.
 					+	(evothings.os.isIOS() ? '' : device.address + '<br />')
-					+	device.rssi
-					+ ' <button onclick="app.connect(\'' + device.address + '\')" class="red right">CONNECT</button>'
+					+	'<button onclick="app.connect(\'' + device.address + '\')" class="red">CONNECT</button> <br />'
+					+ 	 device.rssi 
+					+ 	'<div style="background:rgb(225,0,0);height:20px;width:'
+					+ 		rssiWidth + '%;">'
+					+ 	'</div>'
 					+ '</li>'
 				);
 
@@ -259,14 +262,7 @@ var app = (function()
 	      {
 	      	// Callback function for button notification
 	      	var bg = document.getElementById('connected');
-
-			if(bg.style.backgroundColor == 'white')
-			{
-				bg.style.backgroundColor = 'yellow';
-			} else 
-			{
-				bg.style.backgroundColor = 'white';
-			}
+	      	bg.style.backgroundColor = '#'+ ('000000' + (Math.random()*0xFFFFFF<<0).toString(16)).slice(-6);
 	      },
 	      function(errorCode)
 	      {
