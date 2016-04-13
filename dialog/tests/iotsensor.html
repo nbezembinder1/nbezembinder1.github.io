@@ -28,8 +28,8 @@
 		Start the test by pressing the connect button. Make sure the IoT Sensor is powered on and advertising (blue LED blinking). <br />
 		Also check if the type of sensor (RAW or SFL) is correctly set below. 
 	</p>
-	<button onclick="startTest()">Connect</button> <br />
-	<button onclick="resetTest()">Reset</button> <br />
+	<button onclick="startTest()">Connect</button> 
+	<button onclick="resetTest()">Reset</button>
 	<div id="tests" style="display:none">
 		<a id="displaySensors" href="javascript:toggle('sensors');"><h2>Sensors</h2></a>
 		<div id="sensors" style="display:none">
@@ -38,13 +38,13 @@
 				Note that 'Sensor Fusion' is not available when connecting to IoT Sensor RAW. <br />
 				Also, if sensor combination is not set to '_all', not every sensor can be tested.
 			</p>
-			<button onclick="testAccelerometer(10)">Accelerometer</button> <br />
-			<button onclick="testGyroscope(10)">Gyroscope</button> <br />
-			<button onclick="testMagnetometer(10)">Magnetometer</button> <br />
-			<button onclick="testBarometer(10)">Barometer</button> <br />
-			<button onclick="testTemperature(10)">Temperature</button> <br />
-			<button onclick="testHumidity(10)">Humidity</button> <br />
-			<button onclick="testSfl(10)">Sensor Fusion</button> <br />
+			<button onclick="testAccelerometer(10)">Accelerometer</button>
+			<button onclick="testGyroscope(10)">Gyroscope</button>
+			<button onclick="testMagnetometer(10)">Magnetometer</button>
+			<button onclick="testBarometer(10)">Barometer</button>
+			<button onclick="testTemperature(10)">Temperature</button>
+			<button onclick="testHumidity(10)">Humidity</button>
+			<button onclick="testSfl(10)">Sensor Fusion</button>
 		</div>
 
 		<a id="displayBasicConfiguration" href="javascript:toggle('basicconfiguration');"><h2>Basic configuration</h2></a>
@@ -80,6 +80,7 @@
 			<button onclick="deviceInfoTest()">Firmware / Availability</button>
 			<button onclick="testConnectClose(3)">Test connection</button>
 			<button onclick="testRunningStatus()">Running status</button>
+			<button onclick="testStopAllSensors()">Stop all sensors</button>
 		</div>
 
 	</div>
@@ -527,10 +528,10 @@ function testGetSflAndCalibration()
         testLog('Calibration coefficients:'
                 + '\n Sensor Type:   ' + data.SENSOR_TYPE
                 + '\n Q Format:      ' + data.Q_FORMAT
-                + '\n Offset Vector: ' + Array.from(data.OFFSET_VECTOR).toString()
-                + '\n Matrix[0]:     ' + Array.from(data.MATRIX[0]).toString()
-                + '\n Matrix[1]:     ' + Array.from(data.MATRIX[1]).toString()
-                + '\n Matrix[2]:     ' + Array.from(data.MATRIX[2]).toString());
+                + '\n Offset Vector: ' + [].slice.call(data.OFFSET_VECTOR)
+                + '\n Matrix[0]:     ' + [].slice.call(data.MATRIX[0])
+                + '\n Matrix[1]:     ' + [].slice.call(data.MATRIX[1])
+                + '\n Matrix[2]:     ' + [].slice.call(data.MATRIX[2]));
 		
 		testLog('PASS: testGetCalibrationCoefficients');
 	}
@@ -539,8 +540,8 @@ function testGetSflAndCalibration()
 	{
         testLog('Calibration control values:'
                 + '\n Sensor Type:   ' + data.SENSOR_TYPE
-                + '\n Control Flags: ' + Array.from(data.CONTROL_FLAGS).toString()
-                + '\n Parameters:    ' + Array.from(data.PARAMETERS).toString());
+                + '\n Control Flags: ' + [].slice.call(data.CONTROL_FLAGS)
+                + '\n Parameters:    ' + [].slice.call(data.PARAMETERS));
 
 		testLog('PASS: testGetCalibrationControlFlags');
 	}
@@ -575,7 +576,6 @@ function deviceInfoTest()
 	testLog("  Temperature:   " + iotsensor.isTemperatureAvailable());
 	testLog("  Humidity:      " + iotsensor.isHumidityAvailable());
 	testLog("  Sensor Fusion: " + iotsensor.isSflAvailable());
-
 }
 
 function testRunningStatus()
@@ -588,6 +588,14 @@ function testRunningStatus()
 		testLog('Running status: ' + data);
 		testLog('PASS: testRunningStatus');
 	}
+}
+
+function testStopAllSensors()
+{
+	testLog('Testing stop all sensors');
+	iotsensor.disableAllSensors();
+	testLog('All sensors stopped');
+	testLog('PASS: testStopAllSensors');
 }
 
 function toggle(elementId)
