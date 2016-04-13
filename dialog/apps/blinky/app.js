@@ -24,13 +24,15 @@ var app = (function()
 	var updateTimer = null;
 
 	// UUID's used to control the button & LED
-	var CHAR_UUID_LED 					= '5a87b4ef-3bfa-76a8-e642-92933c31434f';
-	var CHAR_UUID_BLINK 				= '8b7f8ebb-661d-c594-e511-4dd564cbb0d8';
-	var CHAR_UUID_BUTTON 				= '6c290d2e-1c03-aca1-ab48-a9b908bae79e';
-	var CHAR_CONFIGURATION_DESCRIPTOR 	= '00002902-0000-1000-8000-00805f9b34fb';
+	var SERVICE_UUID	= 'edfec62e-9910-0bac-5241-d8bda6932a2f';
+	var CHAR_LED 	= '5a87b4ef-3bfa-76a8-e642-92933c31434f';
+	var CHAR_BLINK 	= '8b7f8ebb-661d-c594-e511-4dd564cbb0d8';
+	var CHAR_BUTTON = '6c290d2e-1c03-aca1-ab48-a9b908bae79e';
+	var NOTIFICATION_DESCRIPTOR	= '00002902-0000-1000-8000-00805f9b34fb';
 
 	var scanTime = 25000; // default scan time in ms
 
+	// Wait for all libraries to have loaded
 	app.initialize = function()
 	{
 		document.addEventListener(
@@ -42,62 +44,47 @@ var app = (function()
 	// Display a scan status message
 	function displayConnectStatus(message)
 	{
-		$('#scan-status').html(message);
+		console.log(message);
+		document.getElementById('scan-status').innerHTML = message;
 	};
 
 	function onDeviceReady()
 	{
-		// Not used.
-		// Here you can update the UI to say that
-		// the device (the phone/tablet) is ready
-		// to use BLE and other Cordova functions.
-	};
-
-	// Start the scan. Call the callback function when a device is found.
-	// Format:
-	//   callbackFun(deviceInfo, errorCode)
-	//   deviceInfo: address, rssi, name
-	//   errorCode: String
-	function startScan(callbackFun)
-	{
-		disconnect(); // Only one device can be connected
-		devices = {}; // Clear the list of devices before we start scanning
-
-		evothings.ble.startScan(
-			function(device)
-			{
-				// Report success. Sometimes an RSSI of +127 is reported.
-				// We filter out these values here.
-				if (device.rssi <= 0)
-				{
-					callbackFun(device, null);
-				}
-			},
-			function(errorCode)
-			{
-				// Report error.
-				callbackFun(null, errorCode);
-			}
-		);
-	};
-
-	// Disconnect from device.
-	function disconnect()
-	{
-		evothings.ble.stopScan();
-		evothings.ble.close(deviceHandle);
+		window.location = '#';
 	};
 
 	// Called when Start Scan button is selected.
 	app.onStartScanButton = function()
 	{
-		startScan(deviceFound);
 		displayConnectStatus('Scanning for Bluetooth devices...');
+
+		// Start scanning for devices.
+		// If a device is found, set the timestamp and
+		// insert the device into the array of devices
+		evothings.easyble.startScan(
+			function(device)
+			{		
+				// Set timestamp for device (this is used to remove
+				// inactive devices).
+				device.timeStamp = Date.now();
+
+				// Insert the device into table of found devices.
+				devices[device.address] = device;
+			},
+			function(error)
+			{
+				console.log('Scan error: ' + error);
+			}
+		);
+
+		// Update the device list every 500ms
 		updateTimer = setInterval(displayDeviceList, 500);
+
 		// Automatically stop scanning after a certain time 
 		setTimeout(
-			function() {
-				evothings.ble.stopScan();
+			function() 
+			{
+				evothings.easyble.stopScan();
 				displayConnectStatus('Not Connected');
 				clearInterval(updateTimer);
 			}, 
@@ -105,203 +92,159 @@ var app = (function()
 		); 
 	};
 
-	// Called when Disconnect button is selected.
+	// Called when Disconnect button is pressed.
 	app.onDisconnectButton = function()
 	{
-		disconnect();
-		devices = {};
+		connectee.close(); // Disconnect device
+		devices = {}; // Remove all previously found devices
 		displayConnectStatus('Disconnected');
 		displayDeviceList();
-		clearInterval(updateTimer);
+
+		window.location = '#'; // Return to 'home' screen
 	};
 
-	// Called when a device is found.
-	function deviceFound(device, errorCode)
+	// Display the device list
+	function displayDeviceList()
 	{
-		if (device)
+		// Clear device list
+		document.getElementById('found-devices').innerHTML = '';
+
+		for(address in devices)
 		{
-			// Set timestamp for device (this is used to remove
-			// inactive devices).
-			device.timeStamp = Date.now();
+			var device = devices[address];
 
-			// Insert the device into table of found devices.
-			devices[device.address] = device;
-		}
-		else if (errorCode)
-		{
-			displayConnectStatus('Scan Error: ' + errorCode);
-		}
-	};
-
-	// Display the device list.
-	function displayDeviceList() {
-		
-		// Clear device list.
-		$('#found-devices').empty();
-
-		var timeNow = Date.now();
-
-		$.each(devices, function(key, device)
-		{
-			// Only show devices that are updated during the last 10 seconds.
-			if (device.timeStamp + 10000 > timeNow)
+			// Only show devices that are updated during the last 10 seconds
+			if(device.timeStamp + 10000 > Date.now())
 			{
-				// Map the RSSI value to a width in percent for the indicator.
-				var rssiWidth = 100; // Used when RSSI is zero or greater.
-				if (device.rssi < -100) { rssiWidth = 0; }
-				else if (device.rssi < 0) { rssiWidth = 100 + device.rssi; }
-				
-				// Create tag for device data.
-				var element = $(
-					'<li >'
-					+	'<strong>' + device.name + '</strong> <br />'
-					// Do not show address on iOS since it can be confused
-					// with an iBeacon UUID.
-					+	(evothings.os.isIOS() ? '' : device.address + '<br />')
-					+	'<button onclick="app.connect(\'' + device.address + '\')" class="red">CONNECT</button> <br />'
-					+ 	 device.rssi 
-					+ 	'<div style="background:rgb(225,0,0);height:20px;width:'
-					+ 		rssiWidth + '%;">'
-					+ 	'</div>'
-					+ '</li>'
-				);
-
-				$('#found-devices').append(element);
+				addDeviceToView(device);
 			}
-		});	
-	};
+		}
 
-	app.connect = function(address) {
-		evothings.ble.stopScan();
-		displayConnectStatus('Connecting...');
-		evothings.ble.connect(
-			address,
-			function(connectInfo)
-			{
-				if (connectInfo.state == 2) // Connected
-				{
-					deviceHandle = connectInfo.deviceHandle;
-					connectee = devices[address];
-					displayConnectStatus('Connected to ' + connectee.name);
+	}
 
-					readAll(deviceHandle);
-					
-					devices = {}; // Clear the list after connection
+	function addDeviceToView(device)
+	{
+		var rssiWidth = 100; // Used when RSSI is zero or greater
+		if (device.rssi < -100) { rssiWidth = 0; }
+		else if (device.rssi < 0) { rssiWidth = 100 + device.rssi; }
+
+		// Create tag for device data.
+		var element = 
+			'<li >'
+			+	'<strong>' + device.name + '</strong> <br />'
+			// Do not show address on iOS since it can be confused
+			// with an iBeacon UUID.
+			+	(evothings.os.isIOS() ? '' : device.address + '<br />')
+			+	'<button onclick="app.connect(\'' + device.address + '\')" class="red">CONNECT</button> <br />'
+			+ 	 device.rssi 
+			+ 	'<div style="background:rgb(225,0,0);height:20px;width:'
+			+ 		rssiWidth + '%;">'
+			+ 	'</div>'
+			+ '</li>';
+
+		document.getElementById('found-devices').innerHTML += element;
+	}
+
+	
+	app.connect = function(address) 
+	{
+		var device = devices[address];
+		
+		if(device === undefined)
+		{
+			return;
+		}
+
+		evothings.easyble.stopScan();
+
+		displayConnectStatus('Connecting to: ' + device.name);
+
+		connectee = device; // Store device for future use
+
+		device.connect(
+			function(success)
+			{	
+				displayConnectStatus('Connected to: ' + device.name);
 				
-					window.location = '#connected';
-				}
-				else
-				{
-					displayConnectStatus('Disconnected');
-					window.location = '#';
-				}
+				// No longer update the list of found devices
+				clearInterval(updateTimer); 
+
+				// Read service characteristics. When finished,
+				// call enableButtonNotification
+				device.readServices(
+					[SERVICE_UUID],
+					enableButtonNotification,
+					function(error)
+					{
+						console.log('Error reading services: ' + error);
+					}
+				);
+				window.location = '#connected';
 			},
-			
-			function(errorCode)
+			function(error)
 			{
 				window.location = '#';
-				displayConnectStatus('Connect error: ' + errorCode);
-
+				displayConnectStatus('Connect error: '+ error);
 			}
 		);
 	};
 
-	function readAll(deviceHandle){
-	    console.log('Reading services...');
-
-	    evothings.ble.readAllServiceData(
-			deviceHandle, 
-			function(services)
+	function enableButtonNotification(device)
+	{
+		// Enable notifications
+		device.writeServiceDescriptor(
+			SERVICE_UUID,
+			CHAR_BUTTON,
+			NOTIFICATION_DESCRIPTOR,
+			new Uint8Array([1, 0]),
+			function() 
 			{
-				for (var si in services)
-				{
-					var service = services[si];
-					
-					for (var ci in service.characteristics)
-					{
-						var characteristic = service.characteristics[ci];
-						characteristics[characteristic.uuid] = characteristic;
-						
-						for(var di in characteristic.descriptors) 
-						{
-							var descriptor = characteristic.descriptors[di];
-							characteristics[characteristic.uuid].descriptors[descriptor.uuid] = descriptor;
-						}
-					}
-				}
-
-				if(characteristics[CHAR_UUID_BUTTON].handle && characteristics[CHAR_UUID_BUTTON].descriptors[CHAR_CONFIGURATION_DESCRIPTOR].handle) 
-				{	
-					console.log("Start reading notifications");
-					startReading(deviceHandle);
-				}
-				
+				// success
 			},
-			function(errorCode)
-			{
-				console.log('readAll error: ' + errorCode);
+			function(error)
+			{ 
+				console.log('Error writing service descriptor: '  + error);
 			}
-		);	
-	};
-
-	function startReading(deviceHandle)
-	{
+		);
 		
-		// Turn notifications on
-	   write(
-	      'writeDescriptor',
-	      deviceHandle,
-	      characteristics[CHAR_UUID_BUTTON].descriptors[CHAR_CONFIGURATION_DESCRIPTOR].handle,
-	      new Uint8Array([1,0]));
+		// Start notifications
+		device.enableServiceNotification(
+			SERVICE_UUID,
+			CHAR_BUTTON,
+			function(data)
+			{
+				// Called every time new data is available.
+				var bg = document.getElementById('connected');
+				bg.style.backgroundColor = randomHexColor();
+			},
+			function(error)
+			{
+				console.log('Error enabling notification: ' + error);
+			}
+		);
+	}
 
-	   // Start reading notifications.
-	   evothings.ble.enableNotification(
-	      deviceHandle,
-	      characteristics[CHAR_UUID_BUTTON].handle,
-	      function(data)
-	      {
-	      	// Callback function for button notification
-	      	var bg = document.getElementById('connected');
-	      	bg.style.backgroundColor = '#'+ ('000000' + (Math.random()*0xFFFFFF<<0).toString(16)).slice(-6);
-	      },
-	      function(errorCode)
-	      {
-	         console.log('enableNotification error: ' + errorCode);
-	      });
-	};
-
-	function write(writeFunc, deviceHandle, handle, value)
-	{
-		if (handle)
-		{
-			evothings.ble[writeFunc](
-				deviceHandle,
-				handle,
-				value,
-				function()
-				{
-					console.log(writeFunc + ': ' + handle + ' success.');
-				},
-				function(errorCode)
-				{
-					console.log(writeFunc + ': ' + handle + ' error: ' + errorCode);
-				});
-		}
-	};
-
-	// Called when Toggle button is selected
+	// Called when Toggle button is pressed
 	app.toggle = function() 
 	{
-		ledStatus = !ledStatus;
+		ledStatus = !ledStatus; // Invert LED (on/off)
 
-		write(
-			'writeCharacteristic',
-			deviceHandle,
-			characteristics[CHAR_UUID_LED].handle,
-			new Uint8Array([ledStatus]));
+	   	connectee.writeServiceCharacteristic(
+	    	SERVICE_UUID,
+	     	CHAR_LED,
+	     	new Uint8Array([ledStatus]),
+	     	function()
+	     	{
+	       		// success
+	     	},
+	     	function(error)
+	     	{
+	      		console.log('BLE write error (toggle): ' + error);
+			}
+		);
 	};
 
-	// Called when Blink button/slider is selected
+	// Called when Blink button/slider is pressed
 	app.blink = function(value)
 	{	
 		if(value != null)
@@ -309,21 +252,38 @@ var app = (function()
 			blinkSpeedVal = 100 - value;
 		}
 		
-		write(
-			'writeCharacteristic',
-			deviceHandle,
-			characteristics[CHAR_UUID_BLINK].handle,
-			new Uint8Array([blinkSpeedVal]));
+	   	connectee.writeServiceCharacteristic(
+	    	SERVICE_UUID,
+	     	CHAR_BLINK,
+	     	new Uint8Array([blinkSpeedVal]),
+	     	function()
+	     	{
+	       		// success
+	     	},
+	     	function(error)
+	     	{
+	      		console.log('BLE write error (blink): ' + error);
+			}
+		);
 		
-		$('#speed-status').html(' LED speed ' + (100-blinkSpeedVal) + '%');
+	   	var el = document.getElementById('speed-status');
+	   	el.innerHTML = ' LED speed ' + (100-blinkSpeedVal) + '%';
 	};
 
 	// Called when the Scan time slider is selected
 	app.setScanTime = function(value)
 	{
 		scanTime = value * 1000; // we need time in ms
-		$('#scan-time').html('Bluetooth scan time: ' + value + ' seconds');
+
+	   	var el = document.getElementById('scan-time');
+	   	el.innerHTML = 'Bluetooth scan time: ' + value + ' seconds';
 	};
+
+	function randomHexColor()
+	{
+		var hex = (Math.random()*0xFFFFFF<<0).toString(16);
+ 		return '#'+ ('000000' + hex).slice(-6);
+	}
 
 	return app;
 
