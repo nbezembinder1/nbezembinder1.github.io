@@ -323,9 +323,8 @@
 			// Timer that connect to nearest IoT Sensor after timeout
 			function startConnectTimer()
 			{
-				// Set timeout period, check if scanTime is defined
-				scanTime = ((typeof scanTime == 'undefined') ? 2000 : scanTime);
-
+				var timeOut = 2000; // Scan timeout period (ms)
+				
 				// Start timer
 				setTimeout(
 					function() 
@@ -338,7 +337,7 @@
 							instance.connectToDevice(devices[0], callbackFun, disconnectFun); // Connect to closest device
 						}
 					},
-					scanTime
+					timeOut
 				);
 			}
 
@@ -346,7 +345,9 @@
 			// timeout period (default: 10s)
 			function startNoSensorFoundTimer()
 			{
-				var timeOut = 10000; // Scan timeout period (ms)
+
+				// Set timeout period, check if scanTime is defined
+				scanTime = ((typeof scanTime == 'undefined') ? 2000 : scanTime);
 
 				// Start timer
 				noSensorFoundTimer = setTimeout(
@@ -359,7 +360,7 @@
 							instance.callErrorCallback(iotsensor.error.IOTSENSOR_NOT_FOUND);
 						}
 					},
-					timeOut
+					scanTime
 				);
 			}
 
@@ -599,7 +600,7 @@
 					function(data) { 
 						// var arr = new Uint8Array(data) returns an object
 						// in Safari instead of an Array.
-						instance.handleCommandReply(Array.from(new Uint8Array(data))) 
+						instance.handleCommandReply([].slice.call(new Uint8Array(data))); 
 					},
 					instance.errorFun
 				);
@@ -609,7 +610,7 @@
 			{	
 				// var arr = new Uint8Array(data) returns an object
 				// in Safari instead of an Array.
-				var arr = Array.from(new Uint8Array(data));
+				var arr = [].slice.call(new Uint8Array(data));
 
 				// Collect available sensors (1: available, 0: unavailable)
 				// Byte 0 to 6 return sensor capabilities
@@ -849,7 +850,7 @@
 				function(data) { 
 					// var arr = new Uint8Array(data) returns an object
 					// in Safari instead of an Array.
-					var values = service.dataFun(Array.from(new Uint8Array(data)));
+					var values = service.dataFun([].slice.call(new Uint8Array(data)));
 					callbackFun(values);
 				},
 				instance.errorFun
