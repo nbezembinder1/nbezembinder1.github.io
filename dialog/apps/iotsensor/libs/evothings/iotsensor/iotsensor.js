@@ -1,5 +1,7 @@
 // File: iotsensor.js
 
+"use strict"; 
+
 // Load Dialog IoT Sensor library components.
 evothings.loadScripts(
 [

@@ -2,7 +2,9 @@
 
 // Shared functions for BLE IoT Sensor settings
 ;(function()
-{
+{	
+	"use strict"; 
+
 	/**
 	 * @namespace
 	 * @description JavaScript library for settings of the Dialog IoT Sensor. <br />
@@ -777,7 +779,7 @@
 			arr[0] = control.COMMAND_ID;
 
 			var index = 0;
-			for(key in instance.configuration.BASIC)
+			for(var key in instance.configuration.BASIC)
 			{
 				index++
 				arr[index] = instance.configuration.BASIC[key];
@@ -903,7 +905,7 @@
 			arr[2] = coef.Q_FORMAT;
 
 			// Convert 3xInt16 to Uint8Array
-			for(i = 0; i < 3; i++)
+			for(var i = 0; i < 3; i++)
 			{
 				arr[2*i+3] = coef.OFFSET_VECTOR[i] & 0xFF;
 				arr[2*i+4] = (coef.OFFSET_VECTOR[i] >> 8) & 0xFF;
@@ -911,9 +913,9 @@
 
 			// Convert 3x3 Int16Array to Uint8Array
 			var index = 0;
-			for(j = 0; j < 3; j++)
+			for(var j = 0; j < 3; j++)
 			{
-				for(k = 0; k < 3; k++)
+				for(var k = 0; k < 3; k++)
 				{
 					arr[2*index+9] = coef.MATRIX[j][k] & 0xFF;
 					arr[2*index+10] = (coef.MATRIX[j][k] >> 8) & 0xFF;
@@ -976,7 +978,7 @@
 			arr[2] = cal_control.CONTROL_FLAGS[0];
 			arr[3] = cal_control.CONTROL_FLAGS[1];
 
-			for(i = 0; i < 12; i++)
+			for(var i = 0; i < 12; i++)
 			{
 				arr[4+i] = cal_control.PARAMETERS[i];
 			}
@@ -1049,7 +1051,7 @@
 		instance.handleCommandReply = function(data)
 		{
 			// Find control based on COMMAND_ID
-			for(key in instance.controls)
+			for(var key in instance.controls)
 			{
 				// Second byte is command id
 				if(instance.controls[key]['COMMAND_ID'] === data[1])
@@ -1155,13 +1157,13 @@
 			coef.SENSOR_TYPE	= data[0];
 			coef.Q_FORMAT 		= data[1];
 			
-			for(i = 0;i < 3; i++)
+			for(var i = 0;i < 3; i++)
 			{
 				coef.OFFSET_VECTOR[i] = evothings.util.littleEndianToInt16(data, 2 + 2*i);
 			}
 
 			// Convert 18 byte array to 3x3 Int16 matrix
-			for(j = 0; j < 18; j+=2)
+			for(var j = 0; j < 18; j+=2)
 			{
 				coef.MATRIX[Math.floor(j/6)][(j/2)%3] = evothings.util.littleEndianToInt16(data, 8+j);
 			}
@@ -1186,7 +1188,7 @@
 			cal_control.CONTROL_FLAGS[0] = data[1];
 			cal_control.CONTROL_FLAGS[1] = data[2];
 
-			for(i = 0; i < 12; i++)
+			for(var i = 0; i < 12; i++)
 			{
 				cal_control.PARAMETERS[i] = data[3+i];
 			}
@@ -1209,7 +1211,7 @@
 	{
 		for(var key in array)
 		{
-			this_val = array[key];
+			var this_val = array[key];
 			if(this_val == val)
 			{
 				return key;

@@ -3,6 +3,7 @@
 // Shared functions for BLE IoT Sensor
 ;(function()
 {
+	"use strict"; 
 
 	/**
 	 * @namespace
@@ -597,7 +598,8 @@
 				instance.device.enableServiceNotification(
 					instance.DEVICE_INFO_SERVICE,
 					instance.CONTROL_REPLY,
-					function(data) { 
+					function(data) 
+					{ 
 						// var arr = new Uint8Array(data) returns an object
 						// in Safari instead of an Array.
 						instance.handleCommandReply([].slice.call(new Uint8Array(data))); 

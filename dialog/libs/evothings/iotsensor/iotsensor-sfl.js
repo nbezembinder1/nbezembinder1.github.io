@@ -3,7 +3,8 @@
 
 ;(function() 
 {
-
+	"use strict"; 
+	
 	evothings.iotsensor.ble.SFL = {};
 
 	/**
