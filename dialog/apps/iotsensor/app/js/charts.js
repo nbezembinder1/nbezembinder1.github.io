@@ -72,8 +72,8 @@ var ui = {};
 			
 			case 'barometer'	:
 				chart.setOptions({	millisPerPixel:50,
-									minValue:80000, 
-									maxValue:110000});
+									minValue:800, 
+									maxValue:1100});
 			break;
 			
 			case 'temperature'	:
