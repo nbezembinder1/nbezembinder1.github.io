@@ -6,10 +6,10 @@
 evothings.loadScripts(
 [
 	'libs/evothings/easyble/easyble.js',
-	'libs/evothings/iotsensor/iotsensor-ble.js', // Abstract object for BLE IoT sensors
-	'libs/evothings/iotsensor/iotsensor-sfl.js', // Specific object for SFL
-	'libs/evothings/iotsensor/iotsensor-raw.js', // Specific object for RAW
-	'libs/evothings/iotsensor/iotsensor-settings.js' // Abstract object for BLE IoT sensor settings
+	'libs/evothings/dialog-iotsensor/iotsensor-ble.js', // Abstract object for BLE IoT sensors
+	'libs/evothings/dialog-iotsensor/iotsensor-sfl.js', // Specific object for SFL
+	'libs/evothings/dialog-iotsensor/iotsensor-raw.js', // Specific object for RAW
+	'libs/evothings/dialog-iotsensor/iotsensor-settings.js' // Abstract object for BLE IoT sensor settings
 ]);
 
 /**
