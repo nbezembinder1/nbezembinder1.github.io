@@ -44,7 +44,7 @@
 
 		/**
 		 * @description Determine if a BLE device is an IoT Sensor SFL. <br />
-		 * Checks for the IoT Sensor SFL using the name.
+		 * Checks for the IoT Sensor using the name.
 		 * @instance
 		 * @public
 		 */
@@ -63,7 +63,7 @@
 		instance.sflCallback = function(callbackFun)
 		{
 			instance.sflFun = callbackFun;
-			instance.SFL.dataFun = getSflValues
+			instance.SFL.dataFun = getSflValues;
 			return instance;
 		}
 

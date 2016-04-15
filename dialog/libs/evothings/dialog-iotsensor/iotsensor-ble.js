@@ -321,7 +321,7 @@
 				}
 			}
 
-			// Timer that connect to nearest IoT Sensor after timeout
+			// Timer that connects to nearest IoT Sensor after timeout
 			function startConnectTimer()
 			{
 				var timeOut = 2000; // Scan timeout period (ms)
@@ -1005,14 +1005,14 @@
 	  	 * @description RAW and SFL.
 		 * Private. Calculate barometer value from raw data
 		 * @param data - Uint8Array.
-		 * @return pressure - in Pascal
+		 * @return pressure - in hectopascal
 		 * @instance
 		 * @public
 		 */
 		function getBarometerValue(data)
 		{
 			// Calculate pressure value.
-			var pressure = evothings.util.littleEndianToUint32(data, 3);
+			var pressure = (evothings.util.littleEndianToUint32(data, 3) * (1/100)).toFixed(0);
 
 			return pressure;
 		}
