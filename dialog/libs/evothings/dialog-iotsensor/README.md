@@ -4,11 +4,17 @@ This JavaScript library is used to communicate with the [IoT Sensor Development 
 
 In order to use this library, build a Cordova app that contains the [BLE plugin](https://github.com/evothings/cordova-ble) or create a new application using the [Evothings Workbench](https://evothings.com/doc/studio/workbench.html).
 
-To use this library, place the `libs/evothings/iotsensor` folder in the root of your Evothings application or `www` folder (Cordova). 
+To use this library, place the `libs/evothings/dialog-iotsensor` folder in the root of your Evothings application or `www` folder (Cordova). 
 
 Make sure to also copy the easyble library to `libs/evothings/easyble`. You can find the latest version on the [evothings-libraries repository](https://github.com/evothings/evothings-libraries).
 
 ## Initialization & Connecting
+
+Include the `iotsensor.js` file.
+
+```html
+<script src="libs/evothings/dialog-iotsensor/iotsensor.js"></script>
+```
 
 Create a new iotsensor object by specifying the project type (RAW or SFL) you are using.
 
