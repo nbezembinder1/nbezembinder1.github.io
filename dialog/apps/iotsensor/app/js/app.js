@@ -3,11 +3,11 @@ var app = {};
 (function(){
 
 	// Load script used by this file.
-	evothings.loadScript('ui/ui.js');
-	evothings.loadScript('variables.js');
+	evothings.loadScript('js/charts.js');
 	
 	var iotsensor = null;
 	var scanTime = 10;
+	var devices = {};
 	
 	
 	
@@ -32,7 +32,7 @@ var app = {};
 			.sflCallback(ui.showSensorView)
 			.errorCallback(connectionError);
 	
-			
+		setEventHandlers();	
 		initSensorFunctions();
 		initSensorButtons();
 	}
@@ -84,43 +84,76 @@ var app = {};
 	
 	
 	
-	/*--------------------------------------------------- ----------------------*/
-	/*--------------------------------------------------------------------------*/
-	/*--------------------------ON BUTTON PRESSED FUNCTIONS---------------------*/
-	/*--------------------------------------------------------------------------*/
-	/*--------------------------------------------------------------------------*/
-	
 	/* When the scan button is pressed stop any ongoing scans if there are any.	*/
 	/* Change the connection status to scanning, and clear the found-devices 	*/
 	/* list. Start the scan, if any device is found the addDevice function will	*/
 	/* be called.																*/
 	app.onScanButton = function()
 	{
-		console.log(scanTime * 1000);
-		iotsensor.connectToClosestSensor(
-			(scanTime * 1000),
-			function(succes)
+		iotsensor.startScanningForDevices(
+			function(device)
 			{
-				getSettings(
-					function()
-					{
-						showAvailableSensors();
-						updateSettingsView();
-						displayDeviceInformation(
-							'Connected to IoT sensor with firmware version: ' 
-							+ iotsensor.getFirmwareString()
-						);
-						setCurrentLocation('#connected');
-					}
-				);
-			},
-			function(error)
-			{
-				connectionError(error);				
+				device.timeStamp = Date.now();
+
+				// Insert the device into table of found devices.
+				devices[device.address] = device;
 			}
 		);
-		console.log("scanning..");
-		displayConnectStatus("Scanning for IoT sensor..");
+		displayConnectStatus("Scanning for Bluetooth devices..");
+				
+		updateTimer = setInterval(displayDeviceList, 500);
+		
+		setTimeout(
+			function() 
+			{
+				iotsensor.stopScanningForDevices();
+				displayConnectStatus('Stopped scanning for devices');
+				clearInterval(updateTimer);
+			}, 
+			(scanTime * 1000)
+		); 
+	}
+	
+	
+	
+	
+	app.onConnectButton = function(address)
+	{
+		if(iotsensor.isIoTSensor(devices[address]))
+		{
+			displayConnectStatus("Connecting..");
+			iotsensor.connectToDevice(
+				devices[address],
+				function()
+				{
+					getSettings(
+						function()
+						{
+							showAvailableSensors();
+							updateSettingsView();
+							displayDeviceInformation(
+								'Connected to IoT sensor with firmware version: ' 
+								+ iotsensor.getFirmwareString()
+							);
+							
+							// Clear device list
+							devices = {};
+							displayDeviceList();
+							
+							setCurrentLocation('#connected');
+						}
+					);
+				},
+				function(error)
+				{
+					connectionError(error);		
+				}
+			);
+		}
+		else
+		{
+			displayConnectStatus("Device is not an Dialog IoT Sensor");
+		}
 	}
 	
 	
@@ -129,6 +162,8 @@ var app = {};
 	/* change the connection status to Disconnected.							*/
 	app.onDisconnectButton = function()
 	{
+		devices = {};
+		displayDeviceList();
 		iotsensor.disconnectDevice();
 		displayConnectStatus("Disconnected");
 	}
@@ -337,19 +372,19 @@ var app = {};
 		scanTime = time;
 	}
 	
-	/*--------------------------------------------------------------------------*/
-	/*--------------------------------------------------------------------------*/
-	/*----------------------END ON BUTTON PRESSED FUNCTIONS---------------------*/
-	/*--------------------------------------------------------------------------*/
-	/*--------------------------------------------------------------------------*/
 	
 	
+	/* When the backbutton is pressed check if location is not starting screen	*/
+	/* if so go to connected screen.											*/
+	app.onBackButton = function()
+	{
+		if(location.toString().split("#")[1] != "")
+		{
+			setCurrentLocation("#connected");
+		}
+	}
 	
-	/*--------------------------------------------------------------------------*/
-	/*--------------------------------------------------------------------------*/
-	/*------------------------------DISPLAY FUNCTIONS---------------------------*/
-	/*--------------------------------------------------------------------------*/
-	/*--------------------------------------------------------------------------*/
+
 	
 	/* The updateSettingsView functions updates the entire settings view 		*/
 	/* including the selected settings.											*/
@@ -575,17 +610,63 @@ var app = {};
 	
 	
 	/* The setCurrentLocation function keeps track of the current location that	*/
-	/* is being viewed.															*/
+	/* is being viewed and change backbutton visibility.															*/
 	function setCurrentLocation(window_location)
 	{
 		location = window_location;
+		if(window_location == "#connected" || window_location == "#")
+		{
+			document.getElementById("back").style.display = "none";
+		} 
+		else 
+		{
+			document.getElementById("back").style.display = "block";
+		}
 	}
 	
-	/*--------------------------------------------------------------------------*/
-	/*--------------------------------------------------------------------------*/
-	/*--------------------------END DISPLAY FUNCTIONS---------------------------*/
-	/*--------------------------------------------------------------------------*/
-	/*--------------------------------------------------------------------------*/
+	
+	
+	function addDeviceToView(device)
+	{
+		var rssiWidth = 100; // Used when RSSI is zero or greater
+		if (device.rssi < -100) { rssiWidth = 0; }
+		else if (device.rssi < 0) { rssiWidth = 100 + device.rssi; }
+
+		// Create tag for device data.
+		var element = 
+			'<li >'
+			+	'<strong>' + device.name + '</strong> <br />'
+			// Do not show address on iOS since it can be confused
+			// with an iBeacon UUID.
+			+	(evothings.os.isIOS() ? '' : device.address + '<br />')
+			+	'<button onclick="app.onConnectButton(\'' + device.address + '\')" class="red">CONNECT</button> <br />'
+			+ 	 device.rssi 
+			+ 	'<div style="background:rgb(225,0,0);height:20px;width:'
+			+ 		rssiWidth + '%;">'
+			+ 	'</div>'
+			+ '</li>';
+
+		document.getElementById('found-devices').innerHTML += element;
+	}
+	
+	
+	
+	function displayDeviceList()
+	{
+		// Clear device list
+		document.getElementById('found-devices').innerHTML = '';
+
+		for(address in devices)
+		{
+			var device = devices[address];
+
+			// Only show devices that are updated during the last 10 seconds
+			if(device.timeStamp + 10000 > Date.now())
+			{
+				addDeviceToView(device);
+			}
+		}
+	}
 	
 	
 	
@@ -685,6 +766,18 @@ var app = {};
 	
 	
 	
+	/* The setEventHandlers function sets eventhandler for the backbutton		*/
+	function setEventHandlers()
+	{
+		document.addEventListener(
+			"backbutton",
+			app.onBackButton,
+			false
+		);
+	}
+	
+	
+	
 	/* On click event when something else is clicked then the dropdown menu		*/
 	/* If so hide all dropdown content											*/
 	window.onclick = function(event) 
@@ -696,4 +789,5 @@ var app = {};
 			}			
 		}
 	}
+	
 })();

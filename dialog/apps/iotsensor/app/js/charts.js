@@ -3,7 +3,7 @@ var ui = {};
 (function(){
 	
 	evothings.loadScript('libs/smoothie/smoothie.js');
-	evothings.loadScript('variables.js');
+	evothings.loadScript('js/sensors.js');
 	
 	var chart;
 	var activeSensor;
@@ -111,6 +111,7 @@ var ui = {};
 			initChart();
 			displaySensorName(app.sensors[activeSensor].name);
 			location = "#sensor";
+			document.getElementById("back").style.display = "block";
 			init = true;
 		}
 		showTable(data);

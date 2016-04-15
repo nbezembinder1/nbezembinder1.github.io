@@ -22,7 +22,7 @@
 		'barometer': {		'name': 'Barometer',
 							'active': 'false',
 							'data': ['value'],
-							'unit': 'pA'},
+							'unit': 'hPa'},
 		'sensor_fusion': {	'name': 'Sensor Fusion', 	
 							'active': 'false',
 							'data': ['w', 'x', 'y', 'z'],

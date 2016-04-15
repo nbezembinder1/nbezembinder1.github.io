@@ -11,7 +11,7 @@
 
 	<style>
 		@import 'ui/css/evothings-app.css';
-		@import 'ui/css/iotsensor.css';
+		@import 'app.css';
 	</style>
 
 	<script>
@@ -24,11 +24,11 @@
 <body ontouchstart="" onresize="ui.resizeChart()"><!-- ontouchstart="" enables low-delay CSS transitions. -->
 	<script>window.location= "#"</script>
 	<header>
-		<button id="back" class="back" onclick="history.back()">
+		<button style="display: none" id="back" class="back" onclick="app.onBackButton()">
 			<img src="ui/images/arrow-left.svg" />
 		</button>
 		
-		<img class="logotype" src="ui/images/logo.png" alt="Evothings" />
+		<img class="logotype" src="ui/images/logo.png" alt="Dialog Semiconductor" />
 	
 	</header>
 	
@@ -41,6 +41,8 @@
 
 	<p style="text-align: center" id="scan-status">Initializing App</p>	
 
+	<ul id="found-devices" class="dynamic"></ul>
+	
 	<section id="connected">
 	<p style="text-align: center" id="device-information"></p>		
 		<a href="#">
@@ -103,10 +105,9 @@
 	<script src="cordova.js"></script>
 	<script src="libs/evothings/evothings.js"></script>
 	<script src="libs/evothings/ui/ui.js"></script>
-	<script src="app.js"></script>
-	<script src="libs/evothings/iotsensor/iotsensor.js"></script>
+	<script src="js/app.js"></script>
+	<script src="libs/evothings/dialog-iotsensor/iotsensor.js"></script>
 	<script src="libs/jquery/jquery.js"></script>
-
 	
 </body>
 
