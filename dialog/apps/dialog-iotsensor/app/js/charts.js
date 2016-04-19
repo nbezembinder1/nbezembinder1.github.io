@@ -2,7 +2,7 @@ var ui = {};
 
 (function(){
 	
-	evothings.loadScript('libs/smoothie/smoothie.js');
+	evothings.loadScript('js/smoothie.js');
 	evothings.loadScript('js/sensors.js');
 	
 	var chart;
@@ -36,7 +36,7 @@ var ui = {};
 	/* The setActiveSensor function sets the active sensor.						*/
 	ui.setActiveSensor = function(){
 		for(key in app.sensors){
-			if(app.sensors[key].active == 'true'){
+			if(app.sensors[key].active != 'false'){
 				activeSensor = key;
 			}
 		}
@@ -124,9 +124,10 @@ var ui = {};
 	ui.resizeChart = function(){
 		var c = document.getElementById("chart-div");
 		var ctx = c.getContext("2d");
-		ctx.canvas.width  = innerWidth 
-							- parseInt($('body').css('margin-left'))
-							- parseInt($('body').css('margin-right'));
+		var width = document.body.clientWidth;
+		var height = document.body.clientHeight;
+		ctx.canvas.width  = width;
+		ctx.canvas.height = height / 2;
 	}
 	
 	

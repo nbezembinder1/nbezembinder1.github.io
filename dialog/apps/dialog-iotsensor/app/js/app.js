@@ -116,7 +116,7 @@ var app = {};
 	
 	
 	
-	
+	/* When the connect button is pressed connect to the selected device. 		*/
 	app.onConnectButton = function(address)
 	{
 		if(iotsensor.isIoTSensor(devices[address]))
@@ -126,6 +126,7 @@ var app = {};
 				devices[address],
 				function()
 				{
+					connected = 'true';
 					getSettings(
 						function()
 						{
@@ -176,7 +177,12 @@ var app = {};
 	/* when new data is received.												*/
 	app.onSensorButton = function(sensorId)
 	{
-		turnActiveSensorOff();
+		for(key in app.sensors){
+			if(app.sensors[key].active != 'false')
+			{
+				setSensorStatus('false', key);
+			}
+		}
 		app.sensors[sensorId].active = 'true';
 		ui.setActiveSensor();
 	
@@ -320,13 +326,13 @@ var app = {};
 		if(setting == 'A')
 		{
 			newValue = prompt("Sensor Fusion Coefficient " + setting 
-				+ "\nPlease fill in a value between 32768 and 0",
+				+ "\nPlease fill in a value between 0 and 32768",
 				app.settings.CURRENT.BETA_A);
 		} 
 		else 
 		{
 			newValue = prompt("Sensor Fusion Coefficient " + setting 
-				+ "\nPlease fill in a value between 32768 and 0",
+				+ "\nPlease fill in a value between 0 and 32768",
 				app.settings.CURRENT.BETA_M);
 		}
 	
@@ -347,7 +353,7 @@ var app = {};
 			else 
 			{
 				alert(newValue + " is an invalid value, please choose a value "
-					+ "between 32768 and 0");
+					+ "between 0 and 32768");
 			}
 		}		
 	}
@@ -384,7 +390,50 @@ var app = {};
 		}
 	}
 	
-
+	
+	
+	/* When the toggle sensor button is pressed, turn the active sensor on or	*/
+	/* off depending on the state.												*/
+	app.onToggleSensorButton = function()
+	{
+		for(key in app.sensors)
+		{
+			if(app.sensors[key].active == 'true')
+			{
+				setSensorStatus('suspended', key);
+			}
+			else if(app.sensors[key].active == 'suspended')
+			{
+				setSensorStatus('true', key);
+			}
+		}
+	}
+	
+	
+	
+	/* The suspendActiveSensorfunction turns the active sensor on or off		*/
+	/* depending on the state.													*/
+	function setSensorStatus(state, sensor)
+	{
+		if(state == 'suspended')
+		{
+			app.sensors[sensor].off();
+			app.sensors[sensor].active = 'suspended';
+		}
+		else if(state == 'true')
+		{
+			app.sensors[sensor].on();
+			app.sensors[sensor].active = 'true';
+		} 
+		else if(state == 'false')
+		{
+			app.sensors[key].off();
+			app.sensors[key].active = 'false';
+		}
+		ui.setActiveSensor();
+	}
+	
+	
 	
 	/* The updateSettingsView functions updates the entire settings view 		*/
 	/* including the selected settings.											*/
@@ -722,21 +771,6 @@ var app = {};
 	}
 	
 	
-	
-	/* The turnActiveSensorOff function turns the active sensor off.			*/
-	function turnActiveSensorOff()
-	{
-		for(key in app.sensors)
-		{
-			if(app.sensors[key].active == 'true')
-			{
-				app.sensors[key].active = 'false';
-				app.sensors[key].off();
-			}	
-		}
-	}
-	
-	
 
 	/* The connectionError function handles the connection errors				*/
 	function connectionError(error)
@@ -766,12 +800,44 @@ var app = {};
 	
 	
 	
-	/* The setEventHandlers function sets eventhandler for the backbutton		*/
+	/* The setEventHandlers function sets eventhandler for the backbutton, and	*/
+	/* the functions to set active sensors to suspended when the app is in the 	*/
+	/* background.																*/
 	function setEventHandlers()
 	{
 		document.addEventListener(
 			"backbutton",
 			app.onBackButton,
+			false
+		);
+		
+		document.addEventListener(
+			'pause',
+			function()
+			{
+				for(key in app.sensors)
+				{
+					if(app.sensors[key].active == 'true')
+					{
+						setSensorStatus('suspended',key);
+					}
+				}
+			},
+			false
+		);
+		
+		document.addEventListener(
+			'resume',
+			function()
+			{
+				for(key in app.sensors)
+				{
+					if(app.sensors[key].active == 'suspended')
+					{
+						setSensorStatus('true',key);
+					}
+				}
+			},
 			false
 		);
 	}

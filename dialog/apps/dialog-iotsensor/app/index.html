@@ -59,6 +59,7 @@
 		<h1 id="sensor-view"><b></b></h1>
 		<canvas width="200" height="200" id="chart-div"></canvas>
 		<div id="table-div"></div>
+		<button onclick="app.onToggleSensorButton()" class="red small wide">Toggle Sensor</button>
 	</section>
 
 	<section id="settings">
@@ -95,7 +96,7 @@
 	</section>
 
 	<script>
-				// Call initialize() as soon as device is ready
+		// Call initialize() as soon as device is ready
 		document.addEventListener(
 			'deviceready',
 			function() { evothings.scriptsLoaded(app.initialize) },
