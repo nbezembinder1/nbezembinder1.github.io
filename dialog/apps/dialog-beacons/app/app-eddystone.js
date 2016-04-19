@@ -14,8 +14,9 @@ var timer = null;
 // Regions that define which page to show for each beacon.
 // Since iOS does not expose any MAC addresses we distinguish Eddystone beacons by NID
 var beaconData = {
-	'ad 72 f9 c6 39 b9 6a 7c df db':'page-eddystone-elephant',
-	'25 d5 9d 55 df ec 62 e6 13 56':'page-eddystone-giraffe'
+	'25 d5 9d 55 df ec 62 e6 13 56':'page-eddystone-elephant',
+	'26 d5 9d 55 df ec 62 e6 13 56':'page-eddystone-giraffe', // Note the first byte
+	'27 d5 9d 55 df ec 62 e6 13 56':'page-eddystone-ostrich'
 };
 
 // Currently displayed page.

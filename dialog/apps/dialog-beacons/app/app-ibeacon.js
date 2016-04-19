@@ -10,18 +10,23 @@ var beaconRegions =
 [
 	{
 		id: 'page-ibeacon-elephant',
-		uuid:'C72C49D7-C103-5F8A-0822-14E7AE986E9F',
-		major: 21017,
-		minor: 8885
+		uuid:'54392FC4-CB60-AB74-CE8E-7679F8F1B916',
+		major: 0,
+		minor: 0
 	},
 	{
 		id: 'page-ibeacon-giraffe',
-		uuid:'54392FC4-CB60-AB74-CE8E-7679F8F1B916', // Notice the difference in UUID and major/minor
-		major: 7929,
-		minor: 43032
+		uuid:'55392FC4-CB60-AB74-CE8E-7679F8F1B916', // Notice the difference in UUID and major/minor
+		major: 1,
+		minor: 1
+	},
+	{
+		id: 'page-ibeacon-ostrich',
+		uuid:'56392FC4-CB60-AB74-CE8E-7679F8F1B916', 
+		major: 2,
+		minor: 2
 	}
 ];
-var x = 0;
 
 // Currently displayed page.
 var currentPage = 'page-ibeacon-default';
