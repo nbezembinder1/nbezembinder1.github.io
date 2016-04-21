@@ -127,6 +127,16 @@ var app = {};
 				function()
 				{
 					connected = 'true';
+					
+					// Stop scanning
+					iotsensor.stopScanningForDevices();
+					clearInterval(updateTimer);
+					
+					// Clear device list
+					devices = {};
+					document.getElementById('found-devices').innerHTML = '';
+
+							
 					getSettings(
 						function()
 						{
@@ -137,9 +147,6 @@ var app = {};
 								+ iotsensor.getFirmwareString()
 							);
 							
-							// Clear device list
-							devices = {};
-							displayDeviceList();
 							
 							setCurrentLocation('#connected');
 						}
