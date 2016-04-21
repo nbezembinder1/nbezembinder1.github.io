@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no,
+		shrink-to-fit=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+
+	<title>1KB Demo</title>
+
+	<style>
+		@import 'ui/css/evothings-app.css';
+		@import 'ui/css/app.css';
+	</style>
+
+	<script>
+	// Redirect console.log to Evothings Workbench.
+	if (window.hyper && window.hyper.log) { console.log = hyper.log }
+	</script>
+
+	<script src="cordova.js"></script>
+	<script src="libs/evothings/evothings.js"></script>
+	<script src="libs/evothings/easyble/easyble.js"></script>
+	<script src="libs/smoothie/smoothie.js"></script>
+	<script src="libs/jquery/jquery.js"></script>
+	<script src="app.js"></script>
+
+</head>
+
+<body ontouchstart=""><!-- ontouchstart="" enables low-delay CSS transitions. -->
+	<script>location = "#"</script>
+	<header>
+		<img class="logotype" src="ui/images/logo.png" alt="Dialog" />
+	</header>
+	
+	<h1 align='middle'>1KB Demo</h1>
+
+	<button onclick="app.onStartScanButton()" class="blue small middle">
+		SCAN
+	</button>
+
+	<p align='middle' id="scan-status">Not Connected</p>	
+			
+	<ul id="found-devices" class="dynamic"></ul>
+	
+	<section id='connected'>
+		<button onclick="app.onDisconnectButton()" class="blue small wide">
+			DISCONNECT
+		</button>	
+		
+		<button onclick="app.onReadButton()" class="yellow small wide">
+			Read
+		</button>
+		
+		<table id="table" width="100%"></table>
+
+	</section>
+
+</body>
+
+</html>
