@@ -35,7 +35,7 @@
 				<img src="ui/images/arrow-left.svg" />
 			</button>
 		
-			<img class="logotype" src="ui/images/logo.svg" alt="Evothings" />
+			<img class="logotype" src="ui/images/logo.png" alt="Dialog Semiconductor" />
 
 			<button id="menu-button" tabindex="0" onclick="this.focus()">
 				<img src="ui/images/menu.svg" />
@@ -90,7 +90,7 @@
 					<img class="my-header-image" src="photos/picture-ostrich.png" />
 				</div>
 
-				<ul class = "beacon-list dynamic" id="found-eddystone-beacons" style="display:none"></ul>
+				<ul class = "beacon-list dynamic" id="found-eddystone-beacons" style="display:none; overflow: auto;"></ul>
 
 			</div>
 
@@ -119,18 +119,17 @@
 					<img class="my-header-image" src="photos/picture-ostrich.png" />
 				</div>
 
-				<ul class = "beacon-list dynamic" id="found-ibeacon-beacons" style="display:none"></ul>
+				<ul class = "beacon-list dynamic" id="found-ibeacon-beacons" style="display:none; overflow: auto;"></ul>
 				
 			</div>
 
 		</div>
 
 
-	<section id='troubleshooting'>
-
+	<section id='troubleshooting' style="overflow: auto">
 		<h1>Troubleshooting</h1>
 
-		<p><a href="https://github.com/nbezembinder1/nbezembinder1.github.io">Source code</a></p>
+		<p><a href="https://github.com/evothings/evothings-examples/tree/master/examples/dialog-beacons">Source code</a></p>
 
 		<p>
 			The app filters beacons by using the following data. Eddystone beacons are distinguishes by NID, a 10 byte namespace. iBeacon beacons are distinguished by both UUID and major/minor numbers.
