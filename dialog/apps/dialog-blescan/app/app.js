@@ -88,8 +88,6 @@ function addDeviceToView(device)
 		// Do not show address on iOS since it can be confused
 		// with an iBeacon UUID.
 		+	(evothings.os.isIOS() ? '' : device.address + '<br />')
-		+	'<button onclick="app.connect(\'' + device.address 
-		+ '\')" class="red">CONNECT</button> <br />'
 		+ 	 device.rssi 
 		+ 	'<div style="background:rgb(225,0,0);height:20px;width:'
 		+ 		rssiWidth + '%;">'
