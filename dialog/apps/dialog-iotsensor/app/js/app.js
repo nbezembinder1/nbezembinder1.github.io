@@ -93,10 +93,14 @@ var app = {};
 		iotsensor.startScanningForDevices(
 			function(device)
 			{
-				device.timeStamp = Date.now();
+				// Quick fix to only show IoT devices based on the advertising name
+				if(device.name === "IoT-DK-SFL" || device.name === "IoT-DK-RAW")
+				{
+					device.timeStamp = Date.now();
 
-				// Insert the device into table of found devices.
-				devices[device.address] = device;
+					// Insert the device into table of found devices.
+					devices[device.address] = device;
+				}
 			}
 		);
 		displayConnectStatus("Scanning for Bluetooth devices..");
