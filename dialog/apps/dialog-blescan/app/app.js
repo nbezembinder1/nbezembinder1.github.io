@@ -24,11 +24,6 @@ function onScanbutton()
 
 					// Insert the device into table of found devices.
 					devices[device.address] = device;
-					console.debug('adding device to list' + JSON.stringify(device));
-				}
-				else
-				{
-					console.debug('else' + JSON.stringify(device));
 				}
 			}
 		},
@@ -68,7 +63,6 @@ function displayDeviceList()
 		// Only show devices that are updated during the last 10 seconds
 		if(device.rssi <= 0)
 		{
-			console.debug("blablabla");
 			addDeviceToView(device);
 		}
 	}
