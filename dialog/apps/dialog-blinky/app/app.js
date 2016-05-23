@@ -229,8 +229,8 @@ var app = (function()
 	{
 		ledStatus = !ledStatus; // Invert LED (on/off)
 
-	   	connectee.writeServiceCharacteristic(
-	    	SERVICE_UUID,
+	   	connectee.writeServiceCharacteristicWithoutResponse(
+	   		SERVICE_UUID,
 	     	CHAR_LED,
 	     	new Uint8Array([ledStatus]),
 	     	function()
@@ -252,7 +252,7 @@ var app = (function()
 			blinkSpeedVal = 100 - value;
 		}
 		
-	   	connectee.writeServiceCharacteristic(
+	   	connectee.writeServiceCharacteristicWithoutResponse(
 	    	SERVICE_UUID,
 	     	CHAR_BLINK,
 	     	new Uint8Array([blinkSpeedVal]),
