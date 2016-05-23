@@ -190,23 +190,7 @@ var app = (function()
 	};
 
 	function enableButtonNotification(device)
-	{
-		// Enable notifications
-		device.writeServiceDescriptor(
-			SERVICE_UUID,
-			CHAR_BUTTON,
-			NOTIFICATION_DESCRIPTOR,
-			new Uint8Array([1, 0]),
-			function() 
-			{
-				// success
-			},
-			function(error)
-			{ 
-				console.log('Error writing service descriptor: '  + error);
-			}
-		);
-		
+	{		
 		// Start notifications
 		device.enableServiceNotification(
 			SERVICE_UUID,
