@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no,
+		shrink-to-fit=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+
+	<title>Dialog Semiconductor Weather Station</title>
+
+	<style>
+		@import 'ui/css/evothings-app.css';
+	</style>
+
+	<script>
+	// Redirect console.log to Evothings Workbench.
+	if (window.hyper && window.hyper.log) { console.log = hyper.log }
+	</script>
+
+</head>
+
+<body ontouchstart="" onresize="initDraw()"><!-- ontouchstart="" enables low-delay CSS transitions. -->
+
+	<header>
+
+		<img class="logotype" src="ui/images/logo.svg" alt="Evothings" />
+
+	</header>
+
+	<h1 style="text-align: center">Dialog Weather Station</h1>
+
+	<button class="blue wide" id="connect_button" onclick="connect()">Connect</button>
+	<p style="text-align: center" id="connection_state">Not Connected</p>
+	
+	<canvas style="padding: 0; background-color: white; display: none; float: left" id="thermometer"></canvas>
+	<canvas style="padding: 0; background-color: white; display: none; float: left" id="barometer"></canvas>
+	<canvas style="padding: 0; background-color: white; display: none; float: left" id="hygrometer"></canvas>
+	
+	<script src="cordova.js"></script>
+	<script src="libs/evothings/evothings.js"></script>
+	<script src="libs/evothings/ui/ui.js"></script>
+	<script src="libs/evothings/dialog-iotsensor/iotsensor.js"></script>
+	<script src="app.js"></script>
+</body>
+
+</html>
