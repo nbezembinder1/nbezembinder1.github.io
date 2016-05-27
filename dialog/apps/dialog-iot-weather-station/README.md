@@ -1,4 +1,4 @@
-# Dialog Semiconductor IoT Compass
+# Dialog Semiconductor IoT Weather Station
 
 This application demonstrates the functionality of the [DA14583 IoT Sensor](http://www.dialog-semiconductor.com/iotsensor). The IoT Sensor provides the means to gather and process sensor data among six different sensors.
 
