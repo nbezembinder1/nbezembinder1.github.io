@@ -1,6 +1,6 @@
 var scanTime = 30000; // Scan for 30 seconds
 var devices = {};
-var scanAddresses = ['80:EA:CA:00:00:FD', '80:EA:CA:00:01:FD'];
+var scanAddresses = ['80:EA:CA:00:00:FD', '80:EA:CA:00:01:FD', '80:EA:CA:00:D0:6D'];
 var updateTimer = null;
 
 function onScanbutton()
