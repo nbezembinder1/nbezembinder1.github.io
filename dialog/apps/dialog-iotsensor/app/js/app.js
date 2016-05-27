@@ -93,8 +93,8 @@ var app = {};
 		iotsensor.startScanningForDevices(
 			function(device)
 			{
-				// Quick fix to only show IoT devices based on the advertising name
-				if(device.name === "IoT-DK-SFL" || device.name === "IoT-DK-RAW")
+				// Only show IoT devices based on the advertising name
+				if(device.name === evothings.iotsensor.SFL || device.name === evothings.iotsensor.RAW)
 				{
 					device.timeStamp = Date.now();
 
